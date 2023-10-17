@@ -1,6 +1,7 @@
 import requests
 import json
 import psycopg2
+import Vars
 
 def dbQueryGenerator(type, table, issueId, insertData, tableFields):
     # Проверка типа запроса
@@ -12,15 +13,17 @@ def dbQueryGenerator(type, table, issueId, insertData, tableFields):
         query = "INSERT INTO " + table + " ("
         # Цикл по длине массива полей БД
         for i in range(len(tableFields)):
-            # Проверка на последнее значение
+            # Проверка на последнее поле
             if i < (len(tableFields) - 1):
                 query = query + tableFields[i] + ", "
             else:
                 query = query + tableFields[i] + ") VALUES("
+        # Добавление значений переменных
         for i in range(len(tableFields)):
+            # !!! Вывел из под if:
+            insertDataElement = str(insertData[i])
+            insertDataElement = insertDataElement.replace("'", " ")
             if i < (len(tableFields) - 1):
-                insertDataElement = str(insertData[i])
-                insertDataElement = insertDataElement.replace("'", " ")
                 if insertDataElement == "None":
                     query = query + " null, "
                 else:
@@ -44,12 +47,10 @@ def dbQuerySender(creds, type, query):
         connection.close()
 
 def requestSender(service, type, id):
-    sdToken = "ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
-    sdUrl = "https://sd.primo-rpa.ru/api/v1/issues/"
-    azUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/_apis/wit/workitems/"
-    azHeaders = {'Authorization': 'Basic czFcYXR2ZXJldHNraXk6aHppaGhwbXdxamNoNjQ2NnhqN280cGJkbzcycTN5NDVpNTIzdmV0dmtkdmR0ZXJuc25ocQ==',
-    'Cookie': '__RequestVerificationToken=XOAvv89CrU2ZLjTd6rS6hnVJrwGhm0vOjLYlCjrgAXf_P3gg7Gl_s_kWfdh8XHLNuUpjumN0wzoCyTfOPGGnoGrg0shVJDj1OgJONY3RQXo1; \
-    __RequestVerificationToken23cee1b27-a61e-46de-9f45-791afa9423e4=XOAvv89CrU2ZLjTd6rS6hnVJrwGhm0vOjLYlCjrgAXf_P3gg7Gl_s_kWfdh8XHLNuUpjumN0wzoCyTfOPGGnoGrg0shVJDj1OgJONY3RQXo1'}
+    sdToken = Vars.sdToken
+    sdUrl = Vars.sdUrl
+    azUrl = Vars.azUrl
+    azHeaders = Vars.azHeaders
 
     if service == "sd":
         if type == "getList":
@@ -57,8 +58,8 @@ def requestSender(service, type, id):
         elif type == "getItem":
             response = requests.request("GET", (sdUrl + str(id) + "?api_token=" + sdToken))
     if service == "az":
-        if type == "getList":
-            response = "Pass"
+        if type == "exists":
+            response = requests.request("GET", (azUrl + "?ids=" + str(id) + "&fields=id&api-version=7.0"), headers=azHeaders, verify=False)
         elif type == "getItem":
             response = requests.request("GET", (azUrl + str(id)), headers=azHeaders, verify=False)
     return response.json()
