@@ -12,6 +12,11 @@ statusJsonKeys = Vars.sdStatusJsonKeys
 idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "", "", ""))
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
+# lastIdInDb = 2600
+# for id in idsList.copy():
+#     if id < lastIdInDb + 1:
+#         idsList.remove(id)
+
 for id in idsList:
     print("Processing issue #", id)
     # Получение sd issue запросом, преобразование в json:

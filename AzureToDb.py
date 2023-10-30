@@ -6,8 +6,13 @@ dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 
-# Получение и преобразование в одномерный массив списка work items id:
-idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "azure_work_items", "", "", ""))
+# Todo: Старый запрос. Удалить после тестирования.
+# # Получение и преобразование в одномерный массив списка work items id:
+# idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "azure_work_items", "", "", ""))
+# idsList = Functions.responseToOneLevelArray(idsListRaw)
+
+# Получение и преобразование в одномерный массив незаполненных строк в таблице azure_work_items:
+idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NULL")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 
 for id in idsList:
@@ -15,6 +20,7 @@ for id in idsList:
     workItemUrl = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTurl", "azure_work_items", id, "", ""))
     workItemUrl = workItemUrl[0][0]
 
+    # !!! Условие необязательно при использовании списка id по незаполненным строкам (упростить на досуге):
     if workItemUrl == None:
         print("No information about work item", id)
         print("Adding information to DB...")

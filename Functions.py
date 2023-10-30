@@ -3,13 +3,16 @@ import json
 import psycopg2
 import Vars
 
+# Todo: Переосмыслить логику и переделать генератор запросов, потому что сейчас - это пиздец. Возможно, убрать его в sender.
 def dbQueryGenerator(type, table, id, insertData, tableFields):
     # Проверка типа запроса
     if type == "SELECT":
-        if str(id) == "":
+        if str(id) == "" and tableFields == "":
             return "SELECT id FROM " + table + " ORDER BY id ASC"
         elif str(id) == "last":
             return "SELECT id FROM " + table + " ORDER BY id DESC LIMIT 1"
+        elif str(id) != "" and tableFields != "":
+            return "SELECT " + tableFields + " FROM " + table + " WHERE id = " + str(id) + " ORDER BY id DESC LIMIT 1"
         else:
             return "SELECT * FROM " + table + " WHERE id = " + str(id)
     elif type == "SELECTurl":
@@ -17,7 +20,9 @@ def dbQueryGenerator(type, table, id, insertData, tableFields):
     elif type == "SELECTstatus":
         return "SELECT status FROM " + table + " WHERE id = " + str(id)
     elif type == "SELECTlaststatus":
-        return "SELECT status FROM " + table + " WHERE id = " + str(id) + " ORDER BY dt DESC LIMIT 1"
+        return "SELECT status FROM " + table + " WHERE id = " + str(id) + " ORDER BY checked_at DESC LIMIT 1"
+    elif type == "SELECTemptyazure":
+        return "SELECT id FROM " + table + " WHERE url IS NULL"
     elif type == "EXISTS":
         return "SELECT EXISTS (SELECT id FROM " + table + " WHERE id = " + str(id) + ")"
     elif type == "INSERT":

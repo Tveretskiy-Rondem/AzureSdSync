@@ -6,8 +6,20 @@ dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 workItemsRange = Vars.azureWorkItemsRange
+workItemsRangeShort = []
 
-for id in range(workItemsRange[0], workItemsRange[1]):
+# Todo: Вместо жестких рамок добавить остановку по достижении критического количества отсутствующих подряд work items.
+
+# Получение последнего id в БД и изменение списка из sd (удаляются все номера до последнего id в БД). Для полного перебора закомментировать, workItemsRangeShort заменить на workItemsRange:
+lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
+if lastIdInDb != []:
+    workItemsRangeShort.append(lastIdInDb[0][0])
+    workItemsRangeShort.append(workItemsRange[1])
+else:
+    workItemsRangeShort.append(1)
+    workItemsRangeShort.append(15000)
+
+for id in range(workItemsRangeShort[0], workItemsRangeShort[1]):
     response = Functions.requestSender(service, "exists", id)
     print("Processing work item #", id)
     if "value" in response:

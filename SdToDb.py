@@ -13,10 +13,11 @@ issuesList = Functions.requestSender(service, "getList", "")
 
 # Получение последнего id в БД и изменение списка из sd (удаляются все номера до последнего id в БД):
 lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "last", "", ""))
-lastIdInDb = lastIdInDb[0][0]
-for id in issuesList.copy():
-    if id < lastIdInDb + 1:
-        issuesList.remove(id)
+if lastIdInDb != []:
+    lastIdInDb = lastIdInDb[0][0]
+    for id in issuesList.copy():
+        if id < lastIdInDb + 1:
+            issuesList.remove(id)
 
 # Для каждого элемента списка проверяется условие существования в БД (для варианта без проверки последнего id),
 # в случае отсутствия, веб-запросом получается json sd issue и помещается в БД:
