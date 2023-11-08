@@ -7,9 +7,12 @@ import Functions
 dbCreds = Vars.dbCreds
 service = Vars.azureService
 
+print("Start")
 sdIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, azure_work_item FROM sd_issues WHERE azure_work_item IS NOT NULL")
 azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE sd_issue IS NOT NULL")
 
+print(sdIssuesList)
+print(azureWorkItemsList)
 for issues in azureWorkItemsList:
     issue = issues[1].strip()
     issue = issue.replace(", ", "---")
