@@ -41,7 +41,7 @@ for id in idsList:
         del tableFieldsWithoutId[0]
 
         # Генерация и отправка в БД запроса на апдейт:
-        print(Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemWithoutId, tableFieldsWithoutId))
+        # print(Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemWithoutId, tableFieldsWithoutId))
         Functions.dbQuerySender(dbCreds, "UPDATE", Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemWithoutId, tableFieldsWithoutId))
 
     else:
