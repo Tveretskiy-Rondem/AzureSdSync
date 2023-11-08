@@ -3,7 +3,8 @@ import SdDiffChecker
 import AzureWorkItemsListToDb
 import AzureToDb
 
-SdToDb
-SdDiffChecker
-AzureWorkItemsListToDb
-AzureToDb
+while True:
+    SdToDb
+    SdDiffChecker
+    AzureWorkItemsListToDb
+    AzureToDb
