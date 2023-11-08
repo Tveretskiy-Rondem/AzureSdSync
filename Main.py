@@ -3,7 +3,7 @@ import SdDiffChecker
 import AzureWorkItemsListToDb
 import AzureToDb
 
-SdToDb
-SdDiffChecker
+# SdToDb
+# SdDiffChecker
 AzureWorkItemsListToDb
 AzureToDb
