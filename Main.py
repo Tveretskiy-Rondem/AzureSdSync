@@ -1,25 +1,32 @@
 import time
+import Vars
 
-# while True:
-#     with open("SdToDb.py") as sdtodb:
-#         exec(sdtodb.read())
-#     with open("SdDiffChecker.py") as sddiffchecker:
-#         exec(sddiffchecker.read())
-#     with open("AzureWorkItemsListToDb.py") as azurelistdb:
-#         exec(azurelistdb.read())
-#     with open("AzureToDb.py") as azuredb:
-#         exec(azuredb.read())
-#     print("Sleep 120 seconds...")
-#     time.sleep(120)
+# Переключатель тест/прод:
+isTest = Vars.isTest
+
+if isTest:
+    # Test path:
+    path = ""
+else:
+    # Service path:
+    path = "/home/ubuntu/AzureSdSync/"
 
 while True:
-    with open("/home/ubuntu/AzureSdSync/SdToDb.py") as sdtodb:
+    with open(path + "SdToDb.py") as sdtodb:
         exec(sdtodb.read())
-    with open("/home/ubuntu/AzureSdSync/SdDiffChecker.py") as sddiffchecker:
+    with open(path + "SdDiffChecker.py") as sddiffchecker:
         exec(sddiffchecker.read())
-    with open("/home/ubuntu/AzureSdSync/AzureWorkItemsListToDb.py") as azurelistdb:
+    with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
         exec(azurelistdb.read())
-    with open("/home/ubuntu/AzureSdSync/AzureToDb.py") as azuredb:
-        exec(azuredb.read())
+    with open(path + "AzureToDb.py") as azuretodb:
+        exec(azuretodb.read())
+    with open(path + "AzureUpdateInfo.py") as azureupdate:
+        exec(azureupdate.read())
+    with open(path + "AzureDiffChecker.py") as azurediffchecker:
+        exec(azurediffchecker.read())
+    with open(path + "AzureSdMatch.py") as match:
+        exec(match.read())
     print("Sleep 120 seconds...")
+    if isTest:
+        break
     time.sleep(120)

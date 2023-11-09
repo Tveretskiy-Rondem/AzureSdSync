@@ -17,12 +17,14 @@ for issues in azureWorkItemsList:
     issue = issues[1].strip()
     issue = issue.replace(", ", "---")
     issue = issue.replace("https://sd.primo-rpa.ru/issues/", "")
+    issue = issue.replace("#!", "")
     issue = issue.replace("/", "")
     issue = issue.replace(" ", "---")
     issue = issue.split("---")
     for issueElement in issue:
         workItemForIssue = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item FROM sd_issues WHERE id = " + issueElement)
         if workItemForIssue != []:
+            print(workItemForIssue[0][0])
             if workItemForIssue[0][0] == str(issues[0]):
                 print("Sd issue #", issueElement, "already mapped with azure work item #", issues[0])
             else:

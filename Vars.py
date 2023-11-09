@@ -1,3 +1,8 @@
+# Переключатели:
+isTest = True
+# 0 - no logs; 1 - minimum logs; 2 - full logs
+logsLevel = 2
+
 # DB:
 # dbCreds = ["postgres", "LqzzPG626!", "192.168.26.26", "5432", "primo"]
 dbCreds = ["postgres", "Qwe123!@#", "localhost", "5432", "primo"]
@@ -15,7 +20,12 @@ sdStatusJsonKeys = [["status", "name"], ["old_status", "name"]]
 azureService = "azure"
 # azureUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/_apis/wit/workitems"
 azureUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems"
-azureHeaders = {'Authorization': 'Basic czFcYXR2ZXJldHNraXk6aHppaGhwbXdxamNoNjQ2NnhqN280cGJkbzcycTN5NDVpNTIzdmV0dmtkdmR0ZXJuc25ocQ=='}
-azureTableFields = ["id", "project", "type", "status", "assigned_to", "created_at", "created_by", "title", "sd_issue", "client", "url"]
-azureJsonKeys = ["id", ["fields", "System.AreaPath"], ["fields", "System.WorkItemType"], ["fields", "System.State"], ["fields", ["System.AssignedTo", "displayName"]], ["fields", "System.CreatedDate"], ["fields", ["System.CreatedBy", "DisplayName"]], ["fields", "System.Title"], ["fields", "Custom.ServiceDesk"], ["fields", "Custom.Client"], "url"]
+azureHeaders = {'Authorization': 'Basic czFcYXR2ZXJldHNraXk6eGRudGw2M3lkYWE1YnYzenRlNGY0cnBicmE1ZnUydTJoeHptZXJiaXUzcHFxd2VvamdicQ=='}
+# azureTableFields = ["id", "project", "type", "status", "assigned_to", "created_at", "created_by", "title", "sd_issue", "client", "url"]
+azureTableFields = ["id", "project", "type", "assigned_to", "created_at", "created_by", "title", "sd_issue", "client", "url"]
+azureJsonKeys = ["id", ["fields", "System.AreaPath"], ["fields", "System.WorkItemType"], ["fields", ["System.AssignedTo", "displayName"]], ["fields", "System.CreatedDate"], ["fields", ["System.CreatedBy", "DisplayName"]], ["fields", "System.Title"], ["fields", "Custom.ServiceDesk"], ["fields", "Custom.Client"], "url"]
+azureStatusTableFields = ["status"]
+azureStatusJsonKeys = [["fields", "System.State"]]
+azureCheckUpdateFields = ["project", "type", "assigned_to", "sd_issue"]
+azureCheckUpdateJsonKeys = [["fields", "System.AreaPath"], ["fields", "System.WorkItemType"], ["fields", ["System.AssignedTo", "displayName"]], ["fields", "Custom.ServiceDesk"]]
 azureWorkItemsRange = [1, 10000]
