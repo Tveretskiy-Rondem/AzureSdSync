@@ -11,6 +11,7 @@ statusJsonKeys = Vars.sdStatusJsonKeys
 
 idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "", "", ""))
 idsList = Functions.responseToOneLevelArray(idsResponse)
+print(idsList)
 
 # lastIdInDb = 2600
 # for id in idsList.copy():
