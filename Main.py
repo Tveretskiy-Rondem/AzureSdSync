@@ -16,6 +16,8 @@ while True:
         exec(sdtodb.read())
     with open(path + "SdDiffChecker.py") as sddiffchecker:
         exec(sddiffchecker.read())
+    with open(path + "SdUpdateInfo.py") as sdupdate:
+        exec(sdupdate.read())
     with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
         exec(azurelistdb.read())
     with open(path + "AzureToDb.py") as azuretodb:

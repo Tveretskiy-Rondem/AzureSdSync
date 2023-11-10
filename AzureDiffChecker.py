@@ -15,7 +15,7 @@ idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenera
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
 for id in idsList:
-    print("Processing issue #", id)
+    print("Processing work item #", id)
     # Получение json work item:
     workItem = Functions.requestSender(service, "getItem", id)
     # Переход на нужный уровень вложенности с проверкой на удаленный (?) work item:
@@ -34,7 +34,7 @@ for id in idsList:
     statusTableFieldsWithId.append("id")
 
     if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_statuses", id, "", "")):
-        print("Status of issue already in DB. Compare statuses.")
+        print("Status of work item already in DB. Compare statuses.")
         dbStatus = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTlaststatus", "azure_statuses", id, "",""))
         if dbStatus[0][0] != workItemStatus[0]:
             print("Detected difference. Insert new status to DB.")

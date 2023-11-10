@@ -15,6 +15,8 @@ sdTableFields = ["id", "title", "created_at", "completed_at", "type", "priority"
 sdJsonKeys = ["id", "title", "created_at", "completed_at", ["type", "name"], ["priority", "name"], "company_id", ["author", "name"], ["assignee", "name"]]
 sdStatusTableFields = ["status", "old_status"]
 sdStatusJsonKeys = [["status", "name"], ["old_status", "name"]]
+sdCheckUpdateFields = ["completed_at", "type", "priority", "assigned_to"]
+sdCheckUpdateJsonKeys = ["completed_at", ["type", "name"], ["priority", "name"], ["assignee", "name"]]
 
 # Azure:
 azureService = "azure"

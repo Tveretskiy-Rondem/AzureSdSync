@@ -26,7 +26,11 @@ for id in idsList:
     workItemDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT " + checkUpdateFieldsStr + " FROM azure_work_items WHERE id = " + str(id))
     workItemDbPrepared = workItemDb[0]
     workItemApi = Functions.requestSender(service, "getItem", id)
-    workItemApi = workItemApi["value"]
+    # Перехват исключения на несуществующий таск:
+    try:
+        workItemApi = workItemApi["value"]
+    except KeyError:
+        continue
     workItemApi = workItemApi[0]
     workItemApiPrepared = Functions.jsonValuesToList(checkUpdateJsonKeys, workItemApi, 0)
     print(workItemDbPrepared)
