@@ -31,6 +31,8 @@ for id in idsList:
     print(issueApiPrepared)
     for i in range(len(issueApiPrepared)):
         if issueDbPrepared[i] == issueDbPrepared[i]:
-            print(issueApiPrepared[i], "=", issueDbPrepared[i])
+            # print(issueApiPrepared[i], "=", issueDbPrepared[i])
+            pass
         else:
             Functions.dbQuerySender(dbCreds, "UPDATE", Functions.dbQueryGenerator("UPDATE", "sd_issues", id, issueApiPrepared, checkUpdateFields))
+            print("Information updated:", issueApiPrepared[i], "=", issueDbPrepared[i])

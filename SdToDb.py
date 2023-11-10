@@ -9,7 +9,9 @@ tableFields = Vars.sdTableFields
 jsonKeys = Vars.sdJsonKeys
 
 # Получение списка ids из sd:
-issuesList = Functions.requestSender(service, "getList", "")
+issuesList = []
+while issuesList == []:
+    issuesList = Functions.requestSender(service, "getList", "")
 
 # Получение последнего id в БД и изменение списка из sd (удаляются все номера до последнего id в БД):
 lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "last", "", ""))
