@@ -34,6 +34,7 @@ for id in idsList:
         statusDbResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTlaststatus", "sd_statuses", id, "", ""))
         if statusDbResponse[0][0] != responseIssueItem[0]:
             print("Detected difference. Insert new status to DB.")
+            Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE sd_statuses SET is_last = false WHERE id = " + str(id))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "sd_statuses", id, responseIssueItemWithId, statusTableFieldsWithId))
         else:
             print("Diffs NOT detected.")

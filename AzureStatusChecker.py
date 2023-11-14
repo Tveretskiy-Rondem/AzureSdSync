@@ -42,9 +42,10 @@ for id in idsList:
             statusTableFieldsWithIdOld = statusTableFieldsWithId.copy()
             workItemStatusWithIdOld.append(dbStatus[0][0])
             statusTableFieldsWithIdOld.append("old_status")
-            print(workItemStatusWithIdOld)
-            print(statusTableFieldsWithIdOld)
-            print(Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithId, statusTableFieldsWithId))
+            Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_statuses SET is_last = false WHERE id = " + str(id))
+            # print(workItemStatusWithIdOld)
+            # print(statusTableFieldsWithIdOld)
+            # print(Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithId, statusTableFieldsWithId))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithIdOld, statusTableFieldsWithIdOld))
         else:
             print("Diffs NOT detected.")
