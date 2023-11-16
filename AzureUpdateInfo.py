@@ -17,7 +17,7 @@ for i in range(len(checkUpdateFields)):
     if (i + 1) < len(checkUpdateFields):
         checkUpdateFieldsStr = checkUpdateFieldsStr + ", "
 
-# Получение и преобразование в одномерный массив незаполненных строк в таблице azure_work_items:
+# Получение и преобразование в одномерный массив id в таблице azure_work_items:
 idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 
@@ -30,13 +30,19 @@ for id in idsList:
     try:
         workItemApi = workItemApi["value"]
     except KeyError:
+        # Удаление соответствия заявке SD, добавление пометки об удалении в таблицу статусов:
+        Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id = " + str(id))
+        Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_statuses SET is_last = false WHERE id = " + str(id))
+        Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_statuses (status, id) VALUES('DELETED?', " + str(id) + ")")
+        print("Work item no more available! Status marked as DELETED")
         continue
     workItemApi = workItemApi[0]
     workItemApiPrepared = Functions.jsonValuesToList(checkUpdateJsonKeys, workItemApi, 0)
-    print(workItemDbPrepared)
-    print(workItemApiPrepared)
+    # print(workItemDbPrepared)
+    # print(workItemApiPrepared)
     for i in range(len(workItemApiPrepared)):
         if workItemDbPrepared[i] == workItemDbPrepared[i]:
-            print(workItemApiPrepared[i], "=", workItemDbPrepared[i])
+            pass
+            # print(workItemApiPrepared[i], "=", workItemDbPrepared[i])
         else:
             Functions.dbQuerySender(dbCreds, "UPDATE", Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemApiPrepared, checkUpdateFields))

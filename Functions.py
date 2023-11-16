@@ -5,7 +5,7 @@ import Vars
 
 requests.packages.urllib3.disable_warnings()
 
-# Todo: Переосмыслить логику и переделать генератор запросов, потому что сейчас - это пиздец. Возможно, убрать его в sender.
+# Todo: Переосмыслить логику и переделать генератор запросов, потому что сейчас - это пи*здец. Возможно, убрать его в sender.
 def dbQueryGenerator(type, table, id, insertData, tableFields):
     # Проверка типа запроса
     if type == "SELECT":
