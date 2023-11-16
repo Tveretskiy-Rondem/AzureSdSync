@@ -18,7 +18,7 @@ for i in range(len(checkUpdateFields)):
         checkUpdateFieldsStr = checkUpdateFieldsStr + ", "
 
 # Получение и преобразование в одномерный массив id в таблице azure_work_items:
-idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items")
+idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE is_deleted = false")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 
 for id in idsList:
@@ -30,10 +30,12 @@ for id in idsList:
     try:
         workItemApi = workItemApi["value"]
     except KeyError:
-        # Удаление соответствия заявке SD, добавление пометки об удалении в таблицу статусов:
+        # Удаление соответствия заявке SD, добавление пометки об удалении в таблицы azure_work_items, azure_statuses:
         Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id = " + str(id))
+        # Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_work_items WHERE id = " + str(id))
+        Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_work_items SET is_deleted = true WHERE id = " + str(id))
         Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_statuses SET is_last = false WHERE id = " + str(id))
-        Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_statuses (status, id) VALUES('DELETED?', " + str(id) + ")")
+        Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_statuses (status, id) VALUES('DELETED', " + str(id) + ")")
         print("Work item no more available! Status marked as DELETED")
         continue
     workItemApi = workItemApi[0]

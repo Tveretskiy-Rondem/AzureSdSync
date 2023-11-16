@@ -69,8 +69,10 @@ for issueId in issuesOpenToInJob:
             responseNewAzureWorkItem = json.loads(responseNewAzureWorkItem.text)
             newAzureWorkItemId = responseNewAzureWorkItem["id"]
 
-            # ToDo Запись в таблицу соответствия
+            # Запись в таблицу соответствия
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(newAzureWorkItemId) + ", " + str(issueId) + ")")
+
+            # ToDo перенос комментариев
             # ToDo Запись в заявку SD
 
         else:
