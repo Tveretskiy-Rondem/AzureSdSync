@@ -28,6 +28,8 @@ while True:
         exec(azurestatuschecker.read())
     with open(path + "AzureSdMatch.py") as match:
         exec(match.read())
+    with open(path + "InitialReview.py") as initial:
+        exec(initial.read())
     print("Sleep 120 seconds...")
     if isTest:
         break

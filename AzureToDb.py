@@ -6,11 +6,6 @@ dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 
-# Todo: Старый запрос. Удалить после тестирования.
-# # Получение и преобразование в одномерный массив списка work items id:
-# idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "azure_work_items", "", "", ""))
-# idsList = Functions.responseToOneLevelArray(idsListRaw)
-
 # Получение и преобразование в одномерный массив незаполненных строк в таблице azure_work_items:
 idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NULL")
 idsList = Functions.responseToOneLevelArray(idsListRaw)

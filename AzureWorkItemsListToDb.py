@@ -7,11 +7,16 @@ tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 workItemsRange = Vars.azureWorkItemsRange
 workItemsRangeShort = []
+fullRange = True
 
 # Todo: Вместо жестких рамок добавить остановку по достижении критического количества отсутствующих подряд work items.
 
-# Получение последнего id в БД и изменение списка из sd (удаляются все номера до последнего id в БД). Для полного перебора закомментировать, workItemsRangeShort заменить на workItemsRange:
-lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
+# Получение последнего id в БД и изменение списка из sd или получение стартового значения :
+if fullRange:
+    lastIdInDb = [[8500]]
+else:
+    lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
+
 if lastIdInDb != []:
     workItemsRangeShort.append(lastIdInDb[0][0])
     workItemsRangeShort.append(workItemsRange[1])
