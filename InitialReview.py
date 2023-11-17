@@ -25,9 +25,10 @@ for issueId in issuesOpenToInJob:
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
-        # Связанная задача есть (делать ничего не нужно):
+        # Связанная задача есть, проверка статуса в azure:
         workItemId = workItemId[0][0]
         print("Issue #", issueId, "assigned to work item #", workItemId)
+        # requests.request("")
     else:
         # Связанной задачи нет:
         print("Issue #", issueId, "not assigned to any work item")

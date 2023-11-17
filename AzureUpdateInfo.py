@@ -18,7 +18,7 @@ for i in range(len(checkUpdateFields)):
         checkUpdateFieldsStr = checkUpdateFieldsStr + ", "
 
 # Получение и преобразование в одномерный массив id в таблице azure_work_items:
-idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items")
+idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items ORDER BY id DESC")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 # idsList = [8605]
 

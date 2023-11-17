@@ -12,7 +12,7 @@ currentFileName = "AzureSdMatch"
 Debug.message(currentFileName, "start", "")
 
 # sdIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, azure_work_item FROM sd_issues WHERE azure_work_item IS NOT NULL")
-azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE sd_issue IS NOT NULL")
+azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE is_deleted = false AND sd_issue IS NOT NULL")
 
 for issuesByWorkItem in azureWorkItemsList:
     workItemId = issuesByWorkItem[0]
