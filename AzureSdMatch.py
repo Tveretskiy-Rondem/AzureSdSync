@@ -11,7 +11,9 @@ currentFileName = "AzureSdMatch"
 
 Debug.message(currentFileName, "start", "")
 
-# sdIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, azure_work_item FROM sd_issues WHERE azure_work_item IS NOT NULL")
+# Удаление из БД связей по несуществующим work_item_id:
+Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id NOT IN (SELECT id FROM azure_work_items WHERE is_deleted = false)")
+# Получение из БД списка неудаленный work items:
 azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE is_deleted = false AND sd_issue IS NOT NULL")
 
 for issuesByWorkItem in azureWorkItemsList:

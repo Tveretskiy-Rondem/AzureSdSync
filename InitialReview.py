@@ -28,7 +28,9 @@ for issueId in issuesOpenToInJob:
         # Связанная задача есть, проверка статуса в azure:
         workItemId = workItemId[0][0]
         print("Issue #", issueId, "assigned to work item #", workItemId)
-        # requests.request("")
+        responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + workItemId), headers=headers, verify=False)
+        responseWorkItem = json.loads(responseWorkItem.text)
+        newAzureWorkItemStatus = responseWorkItem["id"]
     else:
         # Связанной задачи нет:
         print("Issue #", issueId, "not assigned to any work item")

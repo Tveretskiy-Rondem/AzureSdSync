@@ -24,7 +24,6 @@ for id in idsList:
     except KeyError:
         print("Item with id", id, "no more exists!")
         continue
-        # ToDo: добавить поле в таблице об удалении ранее существовавшей записи (если такие будут встречаться)
     workItem = workItem[0]
     # Извлечение статуса:
     workItemStatus = Functions.jsonValuesToList(statusJsonKeys, workItem, 0)
