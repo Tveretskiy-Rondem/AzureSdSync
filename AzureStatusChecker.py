@@ -47,6 +47,7 @@ for id in idsList:
             # print(Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithId, statusTableFieldsWithId))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithIdOld, statusTableFieldsWithIdOld))
         else:
+            pass
             # print("Diffs NOT detected.")
     else:
         # print("Status with this id not exists in DB. Insert new status to DB.")
