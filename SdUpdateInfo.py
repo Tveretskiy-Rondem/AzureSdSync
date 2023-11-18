@@ -27,8 +27,6 @@ for id in idsList:
     issueDbPrepared = issueDb[0]
     issueApi = Functions.requestSender(service, "getItem", id)
     issueApiPrepared = Functions.jsonValuesToList(checkUpdateJsonKeys, issueApi, 0)
-    print(issueDbPrepared)
-    print(issueApiPrepared)
     for i in range(len(issueApiPrepared)):
         if issueDbPrepared[i] == issueDbPrepared[i]:
             # print(issueApiPrepared[i], "=", issueDbPrepared[i])

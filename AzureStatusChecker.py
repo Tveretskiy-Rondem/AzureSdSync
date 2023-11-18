@@ -9,20 +9,19 @@ statusTableFields = Vars.azureStatusTableFields
 jsonKeys = Vars.azureJsonKeys
 statusJsonKeys = Vars.azureStatusJsonKeys
 
-Debug.message("AzureDiffChecker", "start", "")
-
+# Получение списка id work items из БД:
 idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "azure_work_items", "", "", ""))
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
 for id in idsList:
-    print("Processing work item #", id)
+    # print("Processing work item #", id)
     # Получение json work item:
     workItem = Functions.requestSender(service, "getItem", id)
     # Переход на нужный уровень вложенности с проверкой на удаленный (?) work item:
     try:
         workItem = workItem["value"]
     except KeyError:
-        print("Item with id", id, "no more exists!")
+        # print("Item with id", id, "no more exists!")
         continue
     workItem = workItem[0]
     # Извлечение статуса:
@@ -32,11 +31,12 @@ for id in idsList:
     workItemStatusWithId.append(id)
     statusTableFieldsWithId.append("id")
 
+    # Проверка существования в таблице статусов записи с данным id:
     if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_statuses", id, "", "")):
-        print("Status of work item already in DB. Compare statuses.")
+        # print("Status of work item already in DB. Compare statuses.")
         dbStatus = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTlaststatus", "azure_statuses", id, "",""))
         if dbStatus[0][0] != workItemStatus[0]:
-            print("Detected difference. Insert new status to DB.")
+            # print("Detected difference. Insert new status to DB.")
             workItemStatusWithIdOld = workItemStatusWithId.copy()
             statusTableFieldsWithIdOld = statusTableFieldsWithId.copy()
             workItemStatusWithIdOld.append(dbStatus[0][0])
@@ -47,7 +47,7 @@ for id in idsList:
             # print(Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithId, statusTableFieldsWithId))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithIdOld, statusTableFieldsWithIdOld))
         else:
-            print("Diffs NOT detected.")
+            # print("Diffs NOT detected.")
     else:
-        print("Status with this id not exists in DB. Insert new status to DB.")
+        # print("Status with this id not exists in DB. Insert new status to DB.")
         Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_statuses", id, workItemStatusWithId, statusTableFieldsWithId))

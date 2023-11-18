@@ -16,6 +16,7 @@ Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azu
 # Получение из БД списка неудаленный work items:
 azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE is_deleted = false AND sd_issue IS NOT NULL")
 
+# Для каждой заявки в SD в списке work items. Преобразование в номер:
 for issuesByWorkItem in azureWorkItemsList:
     workItemId = issuesByWorkItem[0]
     issuesByWorkItemPrepared = issuesByWorkItem[1].strip()
@@ -25,12 +26,16 @@ for issuesByWorkItem in azureWorkItemsList:
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace("/", "")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(" ", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.split("---")
+
+    # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
         issuesByWorkItemFromTable = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id =" + str(workItemId))
         issuesByWorkItemFromTable = Functions.responseToOneLevelArray(issuesByWorkItemFromTable)
         # print(issueByWorkItem, type(issueByWorkItem))
         # print(issuesByWorkItemFromTable, type(issuesByWorkItemFromTable[0]))
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
+            # ToDo добавить актуализацию ссылки на azure:
+            #  Если заявка уже в списке, проверка на актуальность ссылки на azure work item:
             pass
         else:
             Debug.message(currentFileName, "10", ("work item: " + str(workItemId) + " & sd issue: " + str(issueByWorkItem)))

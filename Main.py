@@ -12,25 +12,32 @@ else:
     path = "/home/ubuntu/AzureSdSync/"
 
 while True:
+    print("SD to DB")
     with open(path + "SdToDb.py") as sdtodb:
         exec(sdtodb.read())
+    print("SD status checker")
     with open(path + "SdStatusChecker.py") as statuschecker:
         exec(statuschecker.read())
+    print("SD info updater")
     with open(path + "SdUpdateInfo.py") as sdupdate:
         exec(sdupdate.read())
+    print("Azure work items list to DB")
     with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
         exec(azurelistdb.read())
+    print("Azure work items content to DB")
     with open(path + "AzureToDb.py") as azuretodb:
         exec(azuretodb.read())
+    print("Azure info updater")
     with open(path + "AzureUpdateInfo.py") as azureupdate:
         exec(azureupdate.read())
+    print("Azure status checker")
     with open(path + "AzureStatusChecker.py") as azurestatuschecker:
         exec(azurestatuschecker.read())
+    print("Matcher")
     with open(path + "AzureSdMatch.py") as match:
         exec(match.read())
+    print("Initial review")
     with open(path + "InitialReview.py") as initial:
         exec(initial.read())
-    print("Sleep 120 seconds...")
     if isTest:
         break
-    time.sleep(120)

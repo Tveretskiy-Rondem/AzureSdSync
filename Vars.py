@@ -1,5 +1,5 @@
 # Переключатели:
-isTest = False
+isTest = True
 # 0 - no logs; 1 - minimum logs; 2 - full logs
 logsLevel = 2
 
@@ -9,7 +9,8 @@ dbCreds = ["postgres", "Qwe123!@#", "localhost", "5432", "primo"]
 
 # SD:
 sdService = "sd"
-sdToken = "ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
+# sdToken = "ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
+sdToken = "8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
 sdUrl = "https://sd.primo-rpa.ru/api/v1/issues/"
 sdTableFields = ["id", "title", "created_at", "completed_at", "type", "priority", "company_id", "author", "assigned_to"]
 sdJsonKeys = ["id", "title", "created_at", "completed_at", ["type", "name"], ["priority", "name"], "company_id", ["author", "name"], ["assignee", "name"]]

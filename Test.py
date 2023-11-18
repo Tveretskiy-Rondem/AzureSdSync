@@ -2,13 +2,19 @@ import re
 import requests
 import json
 issueId = 2701
-workItemId = 8572
+workItemId = 8594
 
-headers = {
-  'Content-Type': 'application/json',
-  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+url = "https://sd.primo-rpa.ru/api/v1/issues/2701/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
+
+payloadToBacklog = json.dumps({
+  "code": "primo_rpa_backlog",
+  "comment": "Тест перехода статуса в бэклог",
+  "comment_public": False
+})
+headersToBacklog = {
+  'Content-Type': 'application/json'
 }
+response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headers, data=payload)
 
-responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + workItemId), headers=headers, verify=False)
-responseWorkItem = json.loads(responseWorkItem.text)
-#newAzureWorkItemStatus = responseWorkItem["id"]
+print(response.text)
+

@@ -23,7 +23,6 @@ idsList = Functions.responseToOneLevelArray(idsListRaw)
 # idsList = [8605]
 
 for id in idsList:
-    Debug.message(currentFileName, "10", str(id))
     workItemDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT " + checkUpdateFieldsStr + " FROM azure_work_items WHERE id = " + str(id))
     try:
         workItemDbPrepared = workItemDb[0]
