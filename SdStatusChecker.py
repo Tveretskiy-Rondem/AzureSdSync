@@ -9,7 +9,9 @@ statusTableFields = Vars.sdStatusTableFields
 jsonKeys = Vars.sdJsonKeys
 statusJsonKeys = Vars.sdStatusJsonKeys
 
-idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "", "", ""))
+# Todo изменить на запрос хардкодом
+idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issues ORDER BY id DESC")
+#idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "", "", ""))
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
 # lastIdInDb = 2600

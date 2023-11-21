@@ -1,20 +1,15 @@
 import re
 import requests
 import json
+
 issueId = 2701
-workItemId = 8594
+workItemId = 8698
 
-url = "https://sd.primo-rpa.ru/api/v1/issues/2701/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
+responseWorkItemProject = "tveretskiy_test"
+# postCommentHeaders = {'Content-Type': 'application/json-patch+json', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
+postCommentHeaders = {'Content-Type': 'application/json', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 
-payloadToBacklog = json.dumps({
-  "code": "primo_rpa_backlog",
-  "comment": "Тест перехода статуса в бэклог",
-  "comment_public": False
-})
-headersToBacklog = {
-  'Content-Type': 'application/json'
-}
-response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headers, data=payload)
-
-print(response.text)
+payloadComment = json.dumps({"text": "Заявка в SD #" + str(issueId) + ", сопоставленная с данной таской, была закрыта. Вот."})
+responseAddComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3", headers=postCommentHeaders,data=payloadComment, verify=False)
+print(responseAddComment.text)
 

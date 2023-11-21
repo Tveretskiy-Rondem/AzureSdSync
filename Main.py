@@ -39,5 +39,7 @@ while True:
     print("Initial review")
     with open(path + "InitialReview.py") as initial:
         exec(initial.read())
+    # with open(path + "ClosedInSd.py") as closedsd:
+    #     exec(closedsd.read())
     if isTest:
         break

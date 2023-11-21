@@ -53,17 +53,16 @@ for issueId in issuesOpenToInJob:
         # Проверка актуальности статуса:
         if responseStatus == ['На рассмотрении']:
             payloadResult = []
+            # Наполнение тела запроса данными:
             for i in range(len(sdJsonKeys)):
                 payloadTemplate["path"] = azurePaths[i]
                 # Проверка на заполнение типа и поля клиента:
                 if azurePaths[i] == "/fields/System.WorkItemType":
-                    # ToDo Вернуть, когда в азуре появятся статусы:
+                    # Определение статуса work item по статусу заявки SD:
                     if responseIssueValues[i] == "Инцидент" or "Ошибка" or "Прочее":
                       payloadTemplate["value"] = "Bug"
                     else:
                       payloadTemplate["value"] = "User Story"
-                    # ToDo А тут убрать:
-                    # payloadTemplate["value"] = "Task"
                 elif azurePaths[i] == "/fields/Custom.Client":
                     # Получение названия клиента по id:
                     sdCompanyUrlWithId = sdCompanyUrl + str(responseIssueValues[i])
@@ -93,6 +92,10 @@ for issueId in issuesOpenToInJob:
             # Запись в таблицу соответствия
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(newAzureWorkItemId) + ", " + str(issueId) + ")")
 
+            # Запись о последнем действии:
+            Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Initial review' WHERE id = " + str(newAzureWorkItemId)))
+            Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
+
             # Перенос комментариев:
             # ToDo убрать токен:
             responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
@@ -102,11 +105,10 @@ for issueId in issuesOpenToInJob:
                 author = author["name"]
                 text = comment["content"]
                 payload = json.dumps({"text": (str(text) + "\Автор в SD:" + str(author))})
+                # Todo изменить при переходе на Discovery
                 requests.request("POST", "https://10.0.2.14/PrimoCollection/tveretskiy_test/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3", headers=headers, data=payload, verify=False)
 
-            # ToDo Запись в заявку SD
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
-            # ToDo условие определяет запись комментария с урлом только в задачу 2701 (убрать, чтобы применялось ко всем задачам):
             payloadUrlToIssue = json.dumps({
                 "comment": {
                     "content": ("Тестовый комментарий. Подлежит удалению. URL сопоставленной задачи в azure:" + str(newAzureWorkItemUrl)),
@@ -116,7 +118,7 @@ for issueId in issuesOpenToInJob:
                 }
             })
             headersUrlToIssue = {'Content-Type': 'application/json'}
-            requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue)
+            requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue, verify=False)
         else:
             # Статус не подтвержден:
             # ToDo: отправить оповещение?
