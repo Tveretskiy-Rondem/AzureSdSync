@@ -1,5 +1,5 @@
 # Переключатели:
-isTest = True
+isTest = False
 # 0 - no logs; 1 - minimum logs; 2 - full logs
 logsLevel = 2
 
