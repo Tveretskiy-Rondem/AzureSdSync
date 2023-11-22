@@ -15,21 +15,21 @@ payloadToClose = json.dumps([{"op": "add", "path": "/fields/System.State", "valu
 # Получение списка заявок SD с последним статусом "Закрыта":
 closedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'Закрыта' AND is_last = true")
 closedIssuesList = Functions.responseToOneLevelArray(closedIssuesList)
-print(closedIssuesList)
+
 # Получение списка заявок SD с последней активностью "Closed in SD":
 alreadyClosedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issues WHERE last_action = 'Closed in SD'")
 alreadyClosedIssuesList = Functions.responseToOneLevelArray(alreadyClosedIssuesList)
 
 for issueId in closedIssuesList:
     # Получение work item id для каждой заявки SD из списка:
-    matchedWorkItemId = Functions.dbQuerySender(dbCreds, "SELECT", ("SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId)))
-    matchedWorkItemId = Functions.responseToOneLevelArray(matchedWorkItemId)
+    matchedWorkItems = Functions.dbQuerySender(dbCreds, "SELECT", ("SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId)))
+    matchedWorkItems = Functions.responseToOneLevelArray(matchedWorkItems)
 
     # Проверка на последнюю активность и соответствие каким-либо work items в азуре:
-    if issueId not in alreadyClosedIssuesList and matchedWorkItemId !=[]:
+    if issueId not in alreadyClosedIssuesList and matchedWorkItems !=[]:
         print(issueId)
 
-        for workItemId in matchedWorkItemId:
+        for workItemId in matchedWorkItems:
             responseWorkItem = requests.request("GET", (getWorkItemUrl + str(workItemId)), headers=getWorkItemHeaders, verify=False)
             responseWorkItem = json.loads(responseWorkItem.text)
             responseWorkItem = responseWorkItem["value"]
