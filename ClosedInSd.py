@@ -7,7 +7,7 @@ toCloseWorkItemsList = []
 onlyCommentClosedWorkItemsList = []
 dbCreds = Vars.dbCreds
 getWorkItemUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids="
-getWorkItemHeaders = {'Authorization': 'Basic czFcYXR2ZXJldHNraXk6eGRudGw2M3lkYWE1YnYzenRlNGY0cnBicmE1ZnUydTJoeHptZXJiaXUzcHFxd2VvamdicQ=='}
+getWorkItemHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 changeStatusHeaders = {'Content-Type': 'application/json-patch+json', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 postCommentHeaders = {'Content-Type': 'application/json', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 payloadToClose = json.dumps([{"op": "add", "path": "/fields/System.State", "value": "Closed"}])
@@ -49,7 +49,6 @@ for issueId in closedIssuesList:
                 # Если статус в azure "Design" или "Backlog"
                 # Закрытие wi с комментарием:
                 # Закрытие:
-
                 responseChangeStatus = requests.request("PATCH", ("https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "?api-version=7.0-preview.3"), headers=changeStatusHeaders, data=payloadToClose, verify=False)
                 # Комментарий:
                 payloadComment = json.dumps({"text": ("Заявка в SD #" + str(issueId) + ", сопоставленная с данной таской, была закрыта.")})

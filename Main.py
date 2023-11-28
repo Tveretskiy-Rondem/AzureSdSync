@@ -39,7 +39,11 @@ while True:
     print("Initial review")
     with open(path + "InitialReview.py") as initial:
         exec(initial.read())
+    # print("Closed in SD")
     # with open(path + "ClosedInSd.py") as closedsd:
     #     exec(closedsd.read())
+    # print("Closed in azure")
+    # with open(path + "ClosedInAzure.py") as closedazure:
+    #     exec(closedazure.read())
     if isTest:
         break

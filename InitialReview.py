@@ -8,8 +8,9 @@ import Vars
 
 dbCreds = Vars.dbCreds
 service = "sd"
-# ToDo заменить пре переходе из тестового проекта в Discovery
-azureUrl = "https://10.0.2.14/PrimoCollection/tveretskiy_test/_apis/wit/workitems/$Task?api-version=7.0"
+
+# ToDo заменить пре переходе из тестового проекта в Discovery (!)
+azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 # azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e&id="
 sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
@@ -40,9 +41,9 @@ for issueId in issuesOpenToInJob:
         responseWorkItem = responseWorkItem["fields"]
         responseWorkItemStatus = responseWorkItem["System.State"]
         responseWorkItemProject = responseWorkItem["System.AreaPath"]
-        # ToDo изменить проект при перехоже на Discovery:
-        if responseWorkItemStatus == "Бэклог" and responseWorkItemProject == "tveretskiy_test":
-            payloadToBacklog = json.dumps({"code": "primo_rpa_backlog", "comment": "Заявка переведена в бэклог соответственно таске из azure.", "comment_public": False})
+        # ToDo изменить проект при перехоже на Discovery (!):
+        if responseWorkItemStatus == "Бэклог" and responseWorkItemProject == "Discovery":
+            payloadToBacklog = json.dumps({"code": "primo_rpa_backlog", "comment": "Заявка переведена в бэклог соответственно связанной задаче из azure.", "comment_public": False})
             headersToBacklog = {'Content-Type': 'application/json'}
             response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersToBacklog, data=payloadToBacklog)
     else:
@@ -75,7 +76,7 @@ for issueId in issuesOpenToInJob:
                         payloadTemplate["value"] = responseSdCompany["name"]
                     except KeyError:
                         payloadTemplate["value"] = "None"
-                # ToDo очистка текста описания от тегов
+                # ToDo очистка текста описания от тегов (!)
                 elif azurePaths[i] == "/fields/System.Description":
                     pattern = re.compile('<.*?>')
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
@@ -105,19 +106,20 @@ for issueId in issuesOpenToInJob:
             # ToDo убрать токен:
             responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
             responseSdIssueComments = json.loads(responseSdIssueComments.text)
+
             for comment in responseSdIssueComments:
                 author = comment["author"]
                 author = author["name"]
                 text = comment["content"]
                 payload = json.dumps({"text": (str(text) + "\Автор в SD:" + str(author))})
                 # Todo изменить при переходе на Discovery
-                requests.request("POST", "https://10.0.2.14/PrimoCollection/tveretskiy_test/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3", headers=headers, data=payload, verify=False)
+                requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3", headers=headers, data=payload, verify=False)
 
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
                 "comment": {
-                    "content": ("Тестовый комментарий. Создана таска в azure: " + str(workItemUrl)),
+                    "content": ("По этой задаче создан work item в azure: " + str(workItemUrl)),
                     "public": False,
                     "author_id": 22,
                     "author_type": "employee"

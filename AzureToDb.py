@@ -1,27 +1,29 @@
 import Functions
 import Vars
 
-service = Vars.azureService
+service = "azure"
 dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
+
+# Debug:
+infoAdded = []
 
 # Получение и преобразование в одномерный массив незаполненных строк в таблице azure_work_items:
 idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NULL")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 
-for id in idsList:
-    print("Processing work item", id)
-    workItemUrl = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTurl", "azure_work_items", id, "", ""))
+for workItemId in idsList:
+    workItemUrl = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTurl", "azure_work_items", workItemId, "", ""))
     workItemUrl = workItemUrl[0][0]
 
     # !!! Условие необязательно при использовании списка id по незаполненным строкам (упростить на досуге):
     if workItemUrl == None:
-        print("No information about work item", id)
-        print("Adding information to DB...")
+        # print("No information about work item", workItemId)
+        # print("Adding information to DB...")
 
         # Отправка веб-запроса, получение ответа:
-        workItem = Functions.requestSender(service, "getItem", id)
+        workItem = Functions.requestSender(service, "getItem", workItemId)
 
         # Разбор полученного JSON до нужного уровня вложенности:
         workItem = workItem["value"]
@@ -37,7 +39,13 @@ for id in idsList:
 
         # Генерация и отправка в БД запроса на апдейт:
         # print(Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemWithoutId, tableFieldsWithoutId))
-        Functions.dbQuerySender(dbCreds, "UPDATE", Functions.dbQueryGenerator("UPDATE", "azure_work_items", id, workItemWithoutId, tableFieldsWithoutId))
+        Functions.dbQuerySender(dbCreds, "UPDATE", Functions.dbQueryGenerator("UPDATE", "azure_work_items", workItemId, workItemWithoutId, tableFieldsWithoutId))
+
+        # Debug:
+        infoAdded.append(workItemId)
 
     else:
-        print("Information about work item", id, "already in DB")
+        # print("Information about work item", workItemId, "already in DB")
+        pass
+
+print("Added info to DB:", infoAdded)

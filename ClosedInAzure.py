@@ -7,7 +7,7 @@ import Functions
 
 dbCreds = Vars.dbCreds
 getWorkItemUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids="
-getWorkItemHeaders = {'Authorization': 'Basic czFcYXR2ZXJldHNraXk6eGRudGw2M3lkYWE1YnYzenRlNGY0cnBicmE1ZnUydTJoeHptZXJiaXUzcHFxd2VvamdicQ=='}
+getWorkItemHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 
 # Получение списка таск azure с последним статусом "Closed":
 closedWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_statuses WHERE status = 'Closed' AND is_last = true ")
@@ -30,7 +30,7 @@ for workItemId in closedWorkItemsList:
     responseWorkItemProject = responseWorkItemFields["System.TeamProject"]
     responseWorkItemIteration = responseWorkItemFields["System.IterationPath"]
     responseWorkItemIteration = responseWorkItemIteration.strip(responseWorkItemProject + "\\\\")
-        for issueId in matchedIssues:
+    for issueId in matchedIssues:
         # Комментарий в привязанную заявку SD:
         payloadUrlToIssue = json.dumps({
             "comment": {
@@ -41,8 +41,9 @@ for workItemId in closedWorkItemsList:
             }
         })
         headersUrlToIssue = {'Content-Type': 'application/json'}
-        requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue,
-                         data=payloadUrlToIssue, verify=False)
+        requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue, verify=False)
         # Todo Добавление информации о назначении на релиз в заявке SD:
 
-    # Todo проставить отметку о последней активности:
+        # Добавление отметки о последней активности:
+        Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Closed in azure' WHERE id = " + str(workItemId)))
+        Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Closed in azure' WHERE id = " + str(issueId)))

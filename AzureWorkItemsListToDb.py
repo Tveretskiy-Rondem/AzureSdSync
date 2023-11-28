@@ -1,13 +1,16 @@
 import Functions
 import Vars
 
-service = Vars.azureService
+service = "azure"
 dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 workItemsRange = Vars.azureWorkItemsRange
 workItemsRangeShort = []
-fullRange = True
+fullRange = False
+
+# Debug:
+notInDb = []
 
 # Todo: Вместо жестких рамок добавить остановку по достижении критического количества отсутствующих подряд work items.
 
@@ -24,14 +27,20 @@ else:
     workItemsRangeShort.append(1)
     workItemsRangeShort.append(10000)
 
-for id in range(workItemsRangeShort[0], workItemsRangeShort[1]):
-    response = Functions.requestSender(service, "exists", id)
-    print("Processing work item #", id)
+for workItemId in range(workItemsRangeShort[0], workItemsRangeShort[1]):
+    response = Functions.requestSender(service, "exists", workItemId)
+    # print("Processing work item #", id)
     if "value" in response:
-        if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_work_items", id, "", "")):
-            print("Already in DB")
+        if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_work_items", workItemId, "", "")):
+            # print("Already in DB")
+            pass
         else:
-            print("Adding work item to DB")
-            Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_work_items", id, [id], ["id"]))
+            Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_work_items", workItemId, [workItemId], ["id"]))
+            # Debug:
+            notInDb.append(workItemId)
     elif "errorCode" in response:
-        print("Not exists in azure")
+        # print("Not exists in azure")
+        pass
+
+# Debug:
+print("Added to DB:", notInDb)

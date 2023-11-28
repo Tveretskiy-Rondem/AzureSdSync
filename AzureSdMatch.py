@@ -6,10 +6,10 @@ import Functions
 import Debug
 
 dbCreds = Vars.dbCreds
-service = Vars.azureService
-currentFileName = "AzureSdMatch"
+service = "azure"
 
-Debug.message(currentFileName, "start", "")
+# Debug
+newMatches = []
 
 # Удаление из БД связей по несуществующим work_item_id:
 Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id NOT IN (SELECT id FROM azure_work_items WHERE is_deleted = false)")
@@ -31,12 +31,15 @@ for issuesByWorkItem in azureWorkItemsList:
     for issueByWorkItem in issuesByWorkItemPrepared:
         issuesByWorkItemFromTable = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id =" + str(workItemId))
         issuesByWorkItemFromTable = Functions.responseToOneLevelArray(issuesByWorkItemFromTable)
-        # print(issueByWorkItem, type(issueByWorkItem))
-        # print(issuesByWorkItemFromTable, type(issuesByWorkItemFromTable[0]))
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
             # ToDo добавить актуализацию ссылки на azure:
-            #  Если заявка уже в списке, проверка на актуальность ссылки на azure work item:
+            # Todo Если заявка уже в списке, проверка на актуальность ссылки на azure work item:
             pass
         else:
-            Debug.message(currentFileName, "10", ("work item: " + str(workItemId) + " & sd issue: " + str(issueByWorkItem)))
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(workItemId) + ", " + str(issueByWorkItem) + ")")
+
+            # Debug:
+            newMatches.append("Azure: " + str(workItemId) + "; SD: " + str(issueByWorkItem))
+
+# Debug:
+print("New matches:", newMatches)
