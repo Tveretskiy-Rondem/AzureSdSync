@@ -10,11 +10,14 @@ dbCreds = Vars.dbCreds
 service = "sd"
 
 # ToDo заменить пре переходе из тестового проекта в Discovery (!)
-azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
+azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Bug?api-version=7.0"
 # azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e&id="
-sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
-azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
+# With Repro steps
+# sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
+# azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
+sdJsonKeys = ["title", "description", ["type", "name"], "id", "company_id"]
+azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
 payloadTemplate = {"op": "add", "path": "", "from": None, "value": ""}
 headers = {
   'Content-Type': 'application/json-patch+json',
@@ -48,12 +51,10 @@ for issueId in issuesOpenToInJob:
             response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersToBacklog, data=payloadToBacklog)
     else:
         # Связанной задачи нет:
-        print("Issue #", issueId, "not assigned to any work item")
         # Получение информации из SD:
         responseIssue = Functions.requestSender(service, "getItem", issueId)
         responseIssueValues = Functions.jsonValuesToList(sdJsonKeys, responseIssue, 0)
         responseStatus = Functions.jsonValuesToList([["status", "name"]], responseIssue, 0)
-        print(responseIssueValues)
         # Проверка актуальности статуса:
         if responseStatus == ['На рассмотрении']:
             payloadResult = []
@@ -87,7 +88,6 @@ for issueId in issuesOpenToInJob:
 
             # Запрос на создание work item:
             payload = json.dumps(payloadResult)
-
             responseNewAzureWorkItem = requests.request("POST", azureUrl, headers=headers, data=payload, verify=False)
             responseNewAzureWorkItem = json.loads(responseNewAzureWorkItem.text)
             newAzureWorkItemId = responseNewAzureWorkItem["id"]
@@ -111,10 +111,13 @@ for issueId in issuesOpenToInJob:
                 author = comment["author"]
                 author = author["name"]
                 text = comment["content"]
-                payload = json.dumps({"text": (str(text) + "\Автор в SD:" + str(author))})
-                # Todo изменить при переходе на Discovery
-                requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3", headers=headers, data=payload, verify=False)
-
+                payload = json.dumps({"text": (str(text) + "   \Автор в SD:" + str(author))})
+                # Todo изменить при переходе на Discovery (!):
+                headersComment = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                }
+                respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
