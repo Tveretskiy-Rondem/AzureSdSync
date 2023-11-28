@@ -26,7 +26,10 @@ for workItemId in idsList:
         workItem = Functions.requestSender(service, "getItem", workItemId)
 
         # Разбор полученного JSON до нужного уровня вложенности:
-        workItem = workItem["value"]
+        try:
+            workItem = workItem["value"]
+        except KeyError:
+            continue
         workItem = workItem[0]
         workItem = Functions.jsonValuesToList(jsonKeys, workItem, 0)
 
