@@ -25,7 +25,6 @@ idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issue
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 
 for issueId in idsList:
-    print("IssueId:", issueId)
     issueDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT " + checkUpdateFieldsStr + " FROM sd_issues WHERE id = " + str(issueId))
     issueDbPrepared = issueDb[0]
     issueApi = Functions.requestSender(service, "getItem", issueId)

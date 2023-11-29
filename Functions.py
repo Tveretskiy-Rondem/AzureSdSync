@@ -85,17 +85,22 @@ def requestSender(service, type, id):
     azureUrl = Vars.azureUrl
     azureHeaders = Vars.azureHeaders
 
-    if service == "sd":
-        if type == "getList":
-            response = requests.request("GET", (sdUrl + "/count?api_token=" + sdToken))
-        elif type == "getItem":
-            response = requests.request("GET", (sdUrl + str(id) + "?api_token=" + sdToken))
-    if service == "azure":
-        if type == "exists":
-            response = requests.request("GET", (azureUrl + "?ids=" + str(id) + "&fields=id&api-version=7.0"), headers=azureHeaders, verify=False)
-        elif type == "getItem":
-            response = requests.request("GET", (azureUrl + "?ids=" + str(id)), headers=azureHeaders, verify=False)
-    return response.json()
+    # Todo добавлена обработка исключения. Проверить!:
+    try:
+        if service == "sd":
+            if type == "getList":
+                response = requests.request("GET", (sdUrl + "/count?api_token=" + sdToken))
+            elif type == "getItem":
+                response = requests.request("GET", (sdUrl + str(id) + "?api_token=" + sdToken))
+        if service == "azure":
+            if type == "exists":
+                response = requests.request("GET", (azureUrl + "?ids=" + str(id) + "&fields=id&api-version=7.0"), headers=azureHeaders, verify=False)
+            elif type == "getItem":
+                response = requests.request("GET", (azureUrl + "?ids=" + str(id)), headers=azureHeaders, verify=False)
+        return response.json()
+    except:
+        errorReturn = []
+        return errorReturn
 
 def jsonValuesToList(keys, response, startElement):
     jsonValues = []
