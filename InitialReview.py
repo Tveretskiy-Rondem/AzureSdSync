@@ -4,7 +4,9 @@ import re
 import Functions
 import Vars
 
-# Todo доделать аттач из SD в Azure!
+# Todo аттач
+# Todo скрины
+# Todo комментарии в обратном порядке
 
 dbCreds = Vars.dbCreds
 service = "sd"
@@ -24,6 +26,9 @@ headers = {
   'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
 }
 
+# Debug:
+newWorkItemsList = []
+
 # Получение списка заявок SD, перешедших в статус "На рассмотрении":
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
@@ -33,7 +38,6 @@ for issueId in issuesOpenToInJob:
     if workItemId != []:
         # Связанная задача есть, проверка статуса в azure:
         workItemId = workItemId[0][0]
-        print("Issue #", issueId, "assigned to work item #", workItemId)
         responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + str(workItemId)), headers=headers, verify=False)
         responseWorkItem = json.loads(responseWorkItem.text)
         try:
@@ -77,7 +81,6 @@ for issueId in issuesOpenToInJob:
                         payloadTemplate["value"] = responseSdCompany["name"]
                     except KeyError:
                         payloadTemplate["value"] = "None"
-                # ToDo очистка текста описания от тегов (!)
                 elif azurePaths[i] == "/fields/System.Description":
                     pattern = re.compile('<.*?>')
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
@@ -102,22 +105,44 @@ for issueId in issuesOpenToInJob:
             Functions.dbQuerySender(dbCreds, "INSERT", ("INSERT INTO azure_work_items (id, last_action) VALUES('" + str(newAzureWorkItemId) + "', 'Initial review')"))
             Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
 
-            # Перенос комментариев:
-            # ToDo убрать токен:
-            responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
-            responseSdIssueComments = json.loads(responseSdIssueComments.text)
+            # Получение и перенос в azure ссылок на вложения:
+            responseIssue = Functions.requestSender(service, "getItem", issueId)
+            responseAttach = responseIssue["attachments"]
 
-            for comment in responseSdIssueComments:
-                author = comment["author"]
-                author = author["name"]
-                text = comment["content"]
-                payload = json.dumps({"text": (str(text) + "   \Автор в SD:" + str(author))})
-                # Todo изменить при переходе на Discovery (!):
+            for attachment in responseAttach:
+                urlGetAttach = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/attachments/" + str(
+                    attachment["id"]) + "?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
+
+                attachmentResponse = requests.request("GET", urlGetAttach)
+                attachmentResponse = json.loads(attachmentResponse.text)
+                attachmentUrl = attachmentResponse["attachment_url"]
+                payload = json.dumps({"text": "Вложение: " + attachmentUrl})
                 headersComment = {
                     'Content-Type': 'application/json',
                     'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
                 }
                 respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+
+            # Перенос комментариев:
+            # ToDo в обратную сторону:
+            responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
+            responseSdIssueComments = json.loads(responseSdIssueComments.text)
+
+            # Todo изменен цикл для организации обратного порядка комментариев:
+            i = len(responseSdIssueComments)
+            while i > 0:
+            # for comment in responseSdIssueComments:
+                comment = responseSdIssueComments[i - 1]
+                author = comment["author"]
+                author = author["name"]
+                text = comment["content"]
+                payload = json.dumps({"text": (str(text) + "   \Автор в SD:" + str(author))})
+                headersComment = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                }
+                respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+                i = i - 1
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
@@ -136,7 +161,14 @@ for issueId in issuesOpenToInJob:
                 }
             })
             response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/parameters?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue)
+
+            # Debug:
+            newWorkItemsList.append(newAzureWorkItemId)
+
         else:
             # Статус не подтвержден:
             # ToDo: отправить оповещение?
             continue
+
+# Debug:
+print("New azure work items:", newWorkItemsList)

@@ -37,8 +37,8 @@ while True:
     with open(path + "AzureSdMatch.py") as match:
         exec(match.read())
     print("Initial review")
-    with open(path + "InitialReview.py") as initial:
-        exec(initial.read())
+    # with open(path + "InitialReview.py") as initial:
+    #     exec(initial.read())
     # print("Closed in SD")
     # with open(path + "ClosedInSd.py") as closedsd:
     #     exec(closedsd.read())
