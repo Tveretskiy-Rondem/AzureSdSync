@@ -136,7 +136,7 @@ for issueId in issuesOpenToInJob:
                 author = comment["author"]
                 author = author["name"]
                 text = comment["content"]
-                payload = json.dumps({"text": (str(text) + "   \Автор в SD:" + str(author))})
+                payload = json.dumps({"text": (str(text) + "   Автор в SD: " + str(author))})
                 headersComment = {
                     'Content-Type': 'application/json',
                     'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='

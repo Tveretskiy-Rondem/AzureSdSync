@@ -1,6 +1,8 @@
 import time
 import Vars
 
+# Todo добавить отправку сообщений о статусе.
+
 # Переключатель тест/прод:
 isTest = Vars.isTest
 
