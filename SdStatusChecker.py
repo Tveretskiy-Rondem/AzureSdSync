@@ -20,8 +20,12 @@ idsList = Functions.responseToOneLevelArray(idsResponse)
 for issueId in idsList:
     # print("Processing issue #", id)
     # Получение sd issue запросом, преобразование в json:
-    responseIssueItem = Functions.requestSender(service, "getItem", issueId)
-    responseIssueItem = Functions.jsonValuesToList(statusJsonKeys, responseIssueItem, 0)
+    # Todo добавлен try. Проверить!:
+    try:
+        responseIssueItem = Functions.requestSender(service, "getItem", issueId)
+        responseIssueItem = Functions.jsonValuesToList(statusJsonKeys, responseIssueItem, 0)
+    except:
+        continue
     # Добавление id в ключи и поля:
     responseIssueItemWithId = responseIssueItem.copy()
     statusTableFieldsWithId = statusTableFields.copy()
