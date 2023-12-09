@@ -1,6 +1,13 @@
+import time
+import datetime
 import Functions
 import Vars
-import Debug
+
+# Функция искусственной задержки запросов в SD:
+def queryDelay(lastQueryTime):
+    queryDelayMs = 270
+    if (datetime.datetime.now() - lastQueryTime).microseconds < queryDelayMs:
+        time.sleep((queryDelayMs - (datetime.datetime.now() - lastQueryTime).microseconds) / 1000)
 
 service = "sd"
 dbCreds = Vars.dbCreds
@@ -8,6 +15,7 @@ tableFields = Vars.sdTableFields
 jsonKeys = Vars.sdJsonKeys
 checkUpdateFields = Vars.sdCheckUpdateFields
 checkUpdateJsonKeys = Vars.sdCheckUpdateJsonKeys
+lastQueryTime = datetime.datetime.now()
 
 # Debug:
 updated = []
@@ -27,7 +35,9 @@ idsList = Functions.responseToOneLevelArray(idsListRaw)
 for issueId in idsList:
     issueDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT " + checkUpdateFieldsStr + " FROM sd_issues WHERE id = " + str(issueId))
     issueDbPrepared = issueDb[0]
+    queryDelay(lastQueryTime)
     issueApi = Functions.requestSender(service, "getItem", issueId)
+    lastQueryTime = datetime.datetime.now()
     issueApiPrepared = Functions.jsonValuesToList(checkUpdateJsonKeys, issueApi, 0)
     for i in range(len(issueApiPrepared)):
         if issueDbPrepared[i] == issueDbPrepared[i]:

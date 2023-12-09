@@ -1,12 +1,23 @@
 # Процесс для наполнения таблицы sd_issues
+import time
+import datetime
 import Functions
 import Vars
+
+# Функция искусственной задержки запросов в SD:
+def queryDelay(lastQueryTime):
+    queryDelayMs = 270
+    if (datetime.datetime.now() - lastQueryTime).microseconds < queryDelayMs:
+        time.sleep((queryDelayMs - (datetime.datetime.now() - lastQueryTime).microseconds) / 1000)
+#
+
 
 service = Vars.sdService
 sdToken = Vars.sdToken
 dbCreds = Vars.dbCreds
 tableFields = Vars.sdTableFields
 jsonKeys = Vars.sdJsonKeys
+lastQueryTime = datetime.datetime.now()
 
 # Debug:
 notInDb = []
@@ -14,7 +25,9 @@ notInDb = []
 # Получение списка ids из sd:
 issuesList = []
 while issuesList == []:
+    queryDelay(lastQueryTime)
     issuesList = Functions.requestSender(service, "getList", "")
+    lastQueryTime = datetime.datetime.now()
 
 # Получение последнего id в БД и изменение списка из sd (удаляются все номера до последнего id в БД):
 lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "last", "", ""))
@@ -33,8 +46,10 @@ for issueId in issuesList:
         pass
     else:
         # print("Issue #", issueNumber, "not exists in DB and will be added")
+        queryDelay(lastQueryTime)
         responseIssue = Functions.requestSender(service, "getItem", issueId)
         responseIssue = Functions.jsonValuesToList(jsonKeys, responseIssue, 0)
+        lastQueryTime = datetime.datetime.now()
         query = Functions.dbQueryGenerator("INSERT", "sd_issues" , responseIssue[0], responseIssue, tableFields)
         Functions.dbQuerySender(dbCreds, "INSERT", query)
         # Debug:

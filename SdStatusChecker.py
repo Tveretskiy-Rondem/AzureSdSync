@@ -1,5 +1,13 @@
+import time
+import datetime
 import Functions
 import Vars
+
+# Функция искусственной задержки запросов в SD:
+def queryDelay(lastQueryTime):
+    queryDelayMs = 270
+    if (datetime.datetime.now() - lastQueryTime).microseconds < queryDelayMs:
+        time.sleep((queryDelayMs - (datetime.datetime.now() - lastQueryTime).microseconds) / 1000)
 
 service = "sd"
 sdToken = Vars.sdToken
@@ -8,6 +16,7 @@ tableFields = Vars.sdTableFields
 statusTableFields = Vars.sdStatusTableFields
 jsonKeys = Vars.sdJsonKeys
 statusJsonKeys = Vars.sdStatusJsonKeys
+lastQueryTime = datetime.datetime.now()
 
 # Debug:
 diffsDetected = []
@@ -22,7 +31,9 @@ for issueId in idsList:
     # Получение sd issue запросом, преобразование в json:
     # Todo добавлен try. Проверить!:
     try:
+        queryDelay(lastQueryTime)
         responseIssueItem = Functions.requestSender(service, "getItem", issueId)
+        lastQueryTime = datetime.datetime.now()
         responseIssueItem = Functions.jsonValuesToList(statusJsonKeys, responseIssueItem, 0)
     except:
         continue
