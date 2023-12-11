@@ -25,7 +25,7 @@ if lastIdInDb != []:
     workItemsRangeShort.append(workItemsRange[1])
 else:
     workItemsRangeShort.append(1)
-    workItemsRangeShort.append(10000)
+    workItemsRangeShort.append(20000)
 
 for workItemId in range(workItemsRangeShort[0], workItemsRangeShort[1]):
     response = Functions.requestSender(service, "exists", workItemId)

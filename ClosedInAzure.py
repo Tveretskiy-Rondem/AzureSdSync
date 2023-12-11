@@ -3,8 +3,6 @@ import json
 import Vars
 import Functions
 
-
-
 dbCreds = Vars.dbCreds
 getWorkItemUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids="
 getWorkItemHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
