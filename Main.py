@@ -20,7 +20,6 @@ startTime = datetime.datetime.now()
 
 def sdBlock():
     try:
-
         print("SD to DB", flush=True)
         with open(path + "SdToDb.py") as sdtodb:
             exec(sdtodb.read())
@@ -43,7 +42,6 @@ def sdBlock():
 
 def azureBlock():
     try:
-
         print("Azure work items list to DB", flush=True)
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
             exec(azurelistdb.read())
@@ -74,8 +72,8 @@ while True:
 
     threadSd = threading.Thread(target=sdBlock())
     threadAzure = threading.Thread(target=azureBlock())
-    threadSd.start()
     threadAzure.start()
+    threadSd.start()
 
     threadSd.join()
     threadAzure.join()
