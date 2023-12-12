@@ -73,9 +73,8 @@ while True:
     iterationStartTime = datetime.datetime.now()
 
     threadSd = threading.Thread(target=sdBlock())
-    threadSd.start()
-
     threadAzure = threading.Thread(target=azureBlock())
+    threadSd.start()
     threadAzure.start()
 
     threadSd.join()
