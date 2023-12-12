@@ -30,8 +30,6 @@ newWorkItemsList = []
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 for issueId in issuesOpenToInJob:
-    print("-------------------------------------------------------------")
-    print("Issue Id:", issueId)
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
@@ -54,7 +52,6 @@ for issueId in issuesOpenToInJob:
     else:
         # Связанной задачи нет:
         # Получение информации из SD:
-        print("Azure wi NOT exists")
         responseIssue = Functions.requestSender(service, "getItem", issueId)
         responseIssueValues = Functions.jsonValuesToList(sdJsonKeys, responseIssue, 0)
         responseStatus = Functions.jsonValuesToList([["status", "name"]], responseIssue, 0)
@@ -86,15 +83,10 @@ for issueId in issuesOpenToInJob:
                     payloadTemplate["value"] = responseIssueValues[i]
                 # Неудачная попытка забрать шаги воспроизведения:
                 elif azurePaths[i] == "/fields/Microsoft.VSTS.TCM.ReproSteps":
-                    print("Repro cycle start")
                     for sdParameter in responseIssue["parameters"]:
-                        print("Sd parameter:", sdParameter)
-                        print("Sd parameter code:", sdParameter["code"])
                         if str(sdParameter["code"]) == "steps_to_reproduce":
                             pattern = re.compile('<.*?>')
-                            print(sdParameter["value"])
                             sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
-                            print(sdParameterNoHtml)
                             payloadTemplate["value"] = sdParameterNoHtml
                 else:
                     payloadTemplate["value"] = responseIssueValues[i]
@@ -131,7 +123,7 @@ for issueId in issuesOpenToInJob:
                 attachmentResponse = json.loads(attachmentResponse.text)
                 attachmentUrl = attachmentResponse["attachment_url"]
                 # payload = json.dumps({"text": "Вложение: " + attachmentUrl})
-                payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">текст ссылки</a>"})
+                payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">Вложение</a>"})
                 headersComment = {
                     'Content-Type': 'application/json',
                     'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
