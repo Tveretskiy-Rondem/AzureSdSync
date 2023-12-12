@@ -1,7 +1,6 @@
 import time
 import Vars
 import datetime
-import threading
 
 # Todo добавить отправку сообщений о статусе.
 
@@ -18,7 +17,10 @@ else:
 
 startTime = datetime.datetime.now()
 
-def sdBlock():
+while True:
+    print("Iteration:", iteration)
+    iterationStartTime = datetime.datetime.now()
+
     try:
 
         print("SD to DB", flush=True)
@@ -34,14 +36,11 @@ def sdBlock():
             with open(path + "SdUpdateInfo.py") as sdupdate:
                 exec(sdupdate.read())
 
-        print("Azure block end", flush=True)
-
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on SD block!")
         print("An exception occurred:", error, flush=True)
 
-def azureBlock:
     try:
 
         print("Azure work items list to DB", flush=True)
@@ -61,29 +60,13 @@ def azureBlock:
         with open(path + "AzureStatusChecker.py") as azurestatuschecker:
             exec(azurestatuschecker.read())
 
-        print("Azure block end", flush=True)
-
+        print("Matcher", flush=True)
+        with open(path + "AzureSdMatch.py") as match:
+            exec(match.read())
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on Azure block!")
         print("An exception occurred:", error, flush=True)
-
-while True:
-    print("Iteration:", iteration)
-    iterationStartTime = datetime.datetime.now()
-
-    threadSd = threading.Thread(target=sdBlock())
-    threadSd.start()
-
-    threadAzure = threading.Thread(target=azureBlock())
-    threadAzure.start()
-
-    threadSd.join()
-    threadAzure.join()
-
-    print("Matcher", flush=True)
-    with open(path + "AzureSdMatch.py") as match:
-        exec(match.read())
 
     try:
         print("Initial review", flush=True)
