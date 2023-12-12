@@ -66,13 +66,12 @@ def azureBlock():
         print("Exception on Azure block!")
         print("An exception occurred:", error, flush=True)
 
-print("Parallel version!")
 while True:
     print("Iteration:", iteration)
     iterationStartTime = datetime.datetime.now()
 
-    threadSd = threading.Thread(target=sdBlock())
     threadAzure = threading.Thread(target=azureBlock())
+    threadSd = threading.Thread(target=sdBlock())
     threadAzure.start()
     threadSd.start()
 
