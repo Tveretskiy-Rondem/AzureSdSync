@@ -91,7 +91,7 @@ for issueId in issuesOpenToInJob:
                     print("Repro cycle start")
                     for sdParameter in responseIssueValues[i]:
                         print("Sd parameter:", sdParameter)
-                        if sdParameter["code"] == "steps_to_reproduce":
+                        if str(sdParameter["code"]) == "steps_to_reproduce":
                             pattern = re.compile('<.*?>')
                             print(sdParameter["value"])
                             sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
