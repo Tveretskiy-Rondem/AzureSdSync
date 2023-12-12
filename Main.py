@@ -41,7 +41,7 @@ def sdBlock():
         print("Exception on SD block!")
         print("An exception occurred:", error, flush=True)
 
-def azureBlock:
+def azureBlock():
     try:
 
         print("Azure work items list to DB", flush=True)
