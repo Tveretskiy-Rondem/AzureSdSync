@@ -1,13 +1,15 @@
 import datetime
 import time
+import requests
+import Functions
 
-queryDelayMs = 270
+issueId = 2788
 
-startTime = datetime.datetime.now()
-for i in range(100):
-    lastTime = datetime.datetime.now()
-    if (datetime.datetime.now() - lastTime).microseconds < queryDelayMs:
-        time.sleep((queryDelayMs - (datetime.datetime.now() - lastTime).microseconds) / 1000)
-        elapsedTime = datetime.datetime.now() - lastTime
+responseIssue = Functions.requestSender("sd", "getItem", issueId)
+for sdParameter in responseIssue["parameters"]:
+    print(sdParameter["code"])
+    if str(sdParameter["code"]) == "steps_to_reproduce":
+        print("It is!")
+        print(sdParameter["value"])
 
-print((datetime.datetime.now() - startTime).seconds)
+print(responseIssue["parameters"])

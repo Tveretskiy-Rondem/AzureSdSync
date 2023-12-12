@@ -15,8 +15,8 @@ sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff5003
 # With Repro steps
 # sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
 # azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
-sdJsonKeys = ["title", "description", "parameters", ["type", "name"], "id", "company_id"]
-azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType",  "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
+sdJsonKeys = ["title", "description", ["type", "name"], "id", "company_id"]
+azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client", "/fields/Microsoft.VSTS.TCM.ReproSteps"]
 payloadTemplate = {"op": "add", "path": "", "from": None, "value": ""}
 headers = {
   'Content-Type': 'application/json-patch+json',
@@ -87,9 +87,10 @@ for issueId in issuesOpenToInJob:
                     pattern = re.compile('<.*?>')
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
                     payloadTemplate["value"] = responseIssueValues[i]
+                # Неудачная попытка забрать шаги воспроизведения:
                 elif azurePaths[i] == "/fields/Microsoft.VSTS.TCM.ReproSteps":
                     print("Repro cycle start")
-                    for sdParameter in responseIssueValues[i]:
+                    for sdParameter in responseIssue["parameters"]:
                         print("Sd parameter:", sdParameter)
                         print("Sd parameter code:", sdParameter["code"])
                         if str(sdParameter["code"]) == "steps_to_reproduce":
@@ -101,6 +102,9 @@ for issueId in issuesOpenToInJob:
                 else:
                     payloadTemplate["value"] = responseIssueValues[i]
                 payloadResult.append(payloadTemplate.copy())
+
+            # Проверка и добавление ReproSteps:
+
 
             # Запрос на создание work item:
             payload = json.dumps(payloadResult)
