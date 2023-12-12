@@ -5,6 +5,7 @@ import Vars
 
 # Переключатель тест/прод:
 isTest = Vars.isTest
+iteration = 0
 
 if isTest:
     # Test path:
@@ -14,6 +15,7 @@ else:
     path = "/home/ubuntu/AzureSdSync/"
 
 while True:
+    print("Iteration:", iteration)
     try:
         print("SD to DB")
         with open(path + "SdToDb.py") as sdtodb:
@@ -24,8 +26,11 @@ while True:
         print("SD info updater")
         with open(path + "SdUpdateInfo.py") as sdupdate:
             exec(sdupdate.read())
-    except:
+    except Exception as error:
+        print("---------------", "WARNING!", end='\n')
         print("Exception on SD block!")
+        print("An exception occurred:", error)
+
     try:
         print("Azure work items list to DB")
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
@@ -42,8 +47,11 @@ while True:
         print("Matcher")
         with open(path + "AzureSdMatch.py") as match:
             exec(match.read())
-    except:
+    except Exception as error:
+        print("---------------", "WARNING!", end='\n')
         print("Exception on Azure block!")
+        print("An exception occurred:", error)
+
     try:
         print("Initial review")
         with open(path + "InitialReview.py") as initial:
@@ -54,7 +62,12 @@ while True:
         # print("Closed in azure")
         # with open(path + "ClosedInAzure.py") as closedazure:
         #     exec(closedazure.read())
-    except:
+    except Exception as error:
+        print("---------------", "WARNING!", end='\n')
         print("Exception on Main logic block!")
+        print("An exception occurred:", error)
+
+    iteration = iteration + 1
+
     if isTest:
         break
