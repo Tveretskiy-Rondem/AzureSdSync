@@ -4,14 +4,11 @@ import re
 import Functions
 import Vars
 
-# Todo аттач
-# Todo скрины
-# Todo комментарии в обратном порядке
+# Todo аттач (норм ссылку)
 
 dbCreds = Vars.dbCreds
 service = "sd"
 
-# ToDo заменить пре переходе из тестового проекта в Discovery (!)
 azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Bug?api-version=7.0"
 # azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e&id="
@@ -29,14 +26,19 @@ headers = {
 # Debug:
 newWorkItemsList = []
 
+print("Initial review start")
+
 # Получение списка заявок SD, перешедших в статус "На рассмотрении":
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 for issueId in issuesOpenToInJob:
+    print("-------------------------------------------------------------")
+    print("Issue Id:", issueId)
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
         # Связанная задача есть, проверка статуса в azure:
+        print("Azure wi exists")
         workItemId = workItemId[0][0]
         responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + str(workItemId)), headers=headers, verify=False)
         responseWorkItem = json.loads(responseWorkItem.text)
@@ -48,7 +50,6 @@ for issueId in issuesOpenToInJob:
         responseWorkItem = responseWorkItem["fields"]
         responseWorkItemStatus = responseWorkItem["System.State"]
         responseWorkItemProject = responseWorkItem["System.AreaPath"]
-        # ToDo изменить проект при перехоже на Discovery (!):
         if responseWorkItemStatus == "Бэклог" and responseWorkItemProject == "Discovery":
             payloadToBacklog = json.dumps({"code": "primo_rpa_backlog", "comment": "Заявка переведена в бэклог соответственно связанной задаче из azure.", "comment_public": False})
             headersToBacklog = {'Content-Type': 'application/json'}
@@ -56,6 +57,7 @@ for issueId in issuesOpenToInJob:
     else:
         # Связанной задачи нет:
         # Получение информации из SD:
+        print("Azure wi NOT exists")
         responseIssue = Functions.requestSender(service, "getItem", issueId)
         responseIssueValues = Functions.jsonValuesToList(sdJsonKeys, responseIssue, 0)
         responseStatus = Functions.jsonValuesToList([["status", "name"]], responseIssue, 0)
@@ -86,10 +88,14 @@ for issueId in issuesOpenToInJob:
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
                     payloadTemplate["value"] = responseIssueValues[i]
                 elif azurePaths[i] == "/fields/Microsoft.VSTS.TCM.ReproSteps":
+                    print("Repro cycle start")
                     for sdParameter in responseIssueValues[i]:
+                        print("Sd parameter:", sdParameter)
                         if sdParameter["code"] == "steps_to_reproduce":
                             pattern = re.compile('<.*?>')
+                            print(sdParameter["value"])
                             sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
+                            print(sdParameterNoHtml)
                             payloadTemplate["value"] = sdParameterNoHtml
                 else:
                     payloadTemplate["value"] = responseIssueValues[i]
@@ -134,7 +140,6 @@ for issueId in issuesOpenToInJob:
             responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
             responseSdIssueComments = json.loads(responseSdIssueComments.text)
 
-            # Todo изменен цикл для организации обратного порядка комментариев:
             i = len(responseSdIssueComments)
             while i > 0:
             # for comment in responseSdIssueComments:
