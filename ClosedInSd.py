@@ -51,7 +51,7 @@ for issueId in closedIssuesList:
                 # Закрытие:
                 responseChangeStatus = requests.request("PATCH", ("https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "?api-version=7.0-preview.3"), headers=changeStatusHeaders, data=payloadToClose, verify=False)
                 # Комментарий:
-                payloadComment = json.dumps({"text": ("Заявка в SD #" + str(issueId) + ", сопоставленная с данной таской, была закрыта.")})
+                payloadComment = json.dumps({"text": ("Заявка в SD # " + str(issueId) + ", привязанная к этой задаче, была закрыта.")})
                 responseAddComment = requests.request("POST", ("https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3"), headers=postCommentHeaders, data=payloadComment, verify=False)
                 # Запись о последнем действии:
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Closed in SD' WHERE id = " + str(workItemId)))
@@ -75,5 +75,5 @@ for issueId in closedIssuesList:
                 print("Test / Review / Ready", "Azure:", workItemId, "SD:", issueId)
                 print("Response comment", responseAddComment.text)
 
-print("Были бы закрыты:", toCloseWorkItemsList)
+print("Был закрыты в Azure:", toCloseWorkItemsList)
 print("Только комментарий:", onlyCommentClosedWorkItemsList)

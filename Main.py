@@ -1,5 +1,6 @@
 import time
 import Vars
+import datetime
 
 # Todo добавить отправку сообщений о статусе.
 
@@ -14,37 +15,51 @@ else:
     # Service path:
     path = "/home/ubuntu/AzureSdSync/"
 
+startTime = datetime.datetime.now()
+
 while True:
     print("Iteration:", iteration)
+    iterationStartTime = datetime.datetime.now()
 
     try:
+
         print("SD to DB", flush=True)
         with open(path + "SdToDb.py") as sdtodb:
             exec(sdtodb.read())
+
         print("SD status checker", flush=True)
         with open(path + "SdStatusChecker.py") as statuschecker:
             exec(statuschecker.read())
-        print("SD info updater", flush=True)
-        with open(path + "SdUpdateInfo.py") as sdupdate:
-            exec(sdupdate.read())
+
+        if (iteration % 3) == 0:
+            print("SD info updater", flush=True)
+            with open(path + "SdUpdateInfo.py") as sdupdate:
+                exec(sdupdate.read())
+
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on SD block!")
         print("An exception occurred:", error, flush=True)
 
     try:
+
         print("Azure work items list to DB", flush=True)
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
             exec(azurelistdb.read())
+
         print("Azure work items content to DB", flush=True)
         with open(path + "AzureToDb.py") as azuretodb:
             exec(azuretodb.read())
-        print("Azure info updater", flush=True)
-        with open(path + "AzureUpdateInfo.py") as azureupdate:
-            exec(azureupdate.read())
+
+        if (iteration % 3) == 0:
+            print("Azure info updater", flush=True)
+            with open(path + "AzureUpdateInfo.py") as azureupdate:
+                exec(azureupdate.read())
+
         print("Azure status checker", flush=True)
         with open(path + "AzureStatusChecker.py") as azurestatuschecker:
             exec(azurestatuschecker.read())
+
         print("Matcher", flush=True)
         with open(path + "AzureSdMatch.py") as match:
             exec(match.read())
@@ -69,3 +84,9 @@ while True:
         print("An exception occurred:", error, flush=True)
 
     iteration = iteration + 1
+
+    wholeTime = datetime.datetime.now() - startTime
+    iterationTime = datetime.datetime.now() - iterationStartTime
+
+    print("Iteration time:", iterationTime)
+    print("Time from start:", wholeTime, flush=True)
