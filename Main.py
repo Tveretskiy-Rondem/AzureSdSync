@@ -66,6 +66,7 @@ def azureBlock():
         print("Exception on Azure block!")
         print("An exception occurred:", error, flush=True)
 
+print("Parallel version!")
 while True:
     print("Iteration:", iteration)
     iterationStartTime = datetime.datetime.now()
