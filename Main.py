@@ -25,7 +25,7 @@ while True:
         with open(path + "SdUpdateInfo.py") as sdupdate:
             exec(sdupdate.read())
     except:
-        continue
+        print("Exception on SD block!")
     try:
         print("Azure work items list to DB")
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
@@ -43,7 +43,7 @@ while True:
         with open(path + "AzureSdMatch.py") as match:
             exec(match.read())
     except:
-        continue
+        print("Exception on Azure block!")
     try:
         print("Initial review")
         with open(path + "InitialReview.py") as initial:
@@ -55,6 +55,6 @@ while True:
         # with open(path + "ClosedInAzure.py") as closedazure:
         #     exec(closedazure.read())
     except:
-        continue
+        print("Exception on Main logic block!")
     if isTest:
         break
