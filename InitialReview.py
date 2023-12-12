@@ -18,8 +18,8 @@ sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff5003
 # With Repro steps
 # sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
 # azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
-sdJsonKeys = ["title", "description", ["type", "name"], "id", "company_id"]
-azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
+sdJsonKeys = ["title", "description", "parameters", ["type", "name"], "id", "company_id"]
+azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType",  "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
 payloadTemplate = {"op": "add", "path": "", "from": None, "value": ""}
 headers = {
   'Content-Type': 'application/json-patch+json',
@@ -85,6 +85,12 @@ for issueId in issuesOpenToInJob:
                     pattern = re.compile('<.*?>')
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
                     payloadTemplate["value"] = responseIssueValues[i]
+                elif azurePaths[i] == "/fields/Microsoft.VSTS.TCM.ReproSteps":
+                    for sdParameter in responseIssueValues[i]:
+                        if sdParameter["code"] == "steps_to_reproduce":
+                            pattern = re.compile('<.*?>')
+                            sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
+                            payloadTemplate["value"] = sdParameterNoHtml
                 else:
                     payloadTemplate["value"] = responseIssueValues[i]
                 payloadResult.append(payloadTemplate.copy())
