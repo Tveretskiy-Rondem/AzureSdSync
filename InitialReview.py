@@ -26,8 +26,6 @@ headers = {
 # Debug:
 newWorkItemsList = []
 
-print("Initial review start")
-
 # Получение списка заявок SD, перешедших в статус "На рассмотрении":
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
@@ -38,7 +36,6 @@ for issueId in issuesOpenToInJob:
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
         # Связанная задача есть, проверка статуса в azure:
-        print("Azure wi exists")
         workItemId = workItemId[0][0]
         responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + str(workItemId)), headers=headers, verify=False)
         responseWorkItem = json.loads(responseWorkItem.text)
@@ -65,7 +62,7 @@ for issueId in issuesOpenToInJob:
         if responseStatus == ['На рассмотрении']:
             payloadResult = []
             # Наполнение тела запроса данными:
-            for i in range(len(sdJsonKeys)):
+            for i in range(len(sdJsonKeys) + 1):
                 payloadTemplate["path"] = azurePaths[i]
                 # Проверка на заполнение типа и поля клиента:
                 if azurePaths[i] == "/fields/System.WorkItemType":
@@ -133,7 +130,8 @@ for issueId in issuesOpenToInJob:
                 attachmentResponse = requests.request("GET", urlGetAttach)
                 attachmentResponse = json.loads(attachmentResponse.text)
                 attachmentUrl = attachmentResponse["attachment_url"]
-                payload = json.dumps({"text": "Вложение: " + attachmentUrl})
+                # payload = json.dumps({"text": "Вложение: " + attachmentUrl})
+                payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">текст ссылки</a>"})
                 headersComment = {
                     'Content-Type': 'application/json',
                     'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
