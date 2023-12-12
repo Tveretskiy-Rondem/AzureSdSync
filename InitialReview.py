@@ -4,8 +4,6 @@ import re
 import Functions
 import Vars
 
-# Todo аттач (норм ссылку)
-
 dbCreds = Vars.dbCreds
 service = "sd"
 
@@ -94,7 +92,6 @@ for issueId in issuesOpenToInJob:
 
             # Проверка и добавление ReproSteps:
 
-
             # Запрос на создание work item:
             payload = json.dumps(payloadResult)
             responseNewAzureWorkItem = requests.request("POST", azureUrl, headers=headers, data=payload, verify=False)
@@ -111,24 +108,25 @@ for issueId in issuesOpenToInJob:
             Functions.dbQuerySender(dbCreds, "INSERT", ("INSERT INTO azure_work_items (id, last_action) VALUES('" + str(newAzureWorkItemId) + "', 'Initial review')"))
             Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
 
+            # Todo сделать перенос файлов
             # Получение и перенос в azure ссылок на вложения:
-            responseIssue = Functions.requestSender(service, "getItem", issueId)
-            responseAttach = responseIssue["attachments"]
-
-            for attachment in responseAttach:
-                urlGetAttach = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/attachments/" + str(
-                    attachment["id"]) + "?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
-
-                attachmentResponse = requests.request("GET", urlGetAttach)
-                attachmentResponse = json.loads(attachmentResponse.text)
-                attachmentUrl = attachmentResponse["attachment_url"]
-                # payload = json.dumps({"text": "Вложение: " + attachmentUrl})
-                payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">Вложение</a>"})
-                headersComment = {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
-                }
-                respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+            # responseIssue = Functions.requestSender(service, "getItem", issueId)
+            # responseAttach = responseIssue["attachments"]
+            #
+            # for attachment in responseAttach:
+            #     urlGetAttach = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/attachments/" + str(
+            #         attachment["id"]) + "?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
+            #
+            #     attachmentResponse = requests.request("GET", urlGetAttach)
+            #     attachmentResponse = json.loads(attachmentResponse.text)
+            #     attachmentUrl = attachmentResponse["attachment_url"]
+            #     # payload = json.dumps({"text": "Вложение: " + attachmentUrl})
+            #     payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">Вложение</a>"})
+            #     headersComment = {
+            #         'Content-Type': 'application/json',
+            #         'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+            #     }
+            #     respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
 
             # Перенос комментариев:
             # ToDo в обратную сторону:
