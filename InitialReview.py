@@ -30,6 +30,7 @@ issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM s
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 print("2")
 for issueId in issuesOpenToInJob:
+    print("Issue id:", issueId)
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
     print("3")
