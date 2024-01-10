@@ -74,21 +74,21 @@ def azureBlock():
         print("An exception occurred:", error, flush=True)
 
 while True:
-    # print("Iteration:", iteration)
-    # iterationStartTime = datetime.datetime.now()
-    #
-    # threadAzure = threading.Thread(target=azureBlock)
-    # threadSd = threading.Thread(target=sdBlock)
-    # threadAzure.start()
-    # threadSd.start()
-    #
-    # threadSd.join()
-    # threadAzure.join()
-    #
-    # print("Start Matcher", flush=True)
-    # with open(path + "AzureSdMatch.py") as match:
-    #     exec(match.read())
-    # print("End Matcher", flush=True)
+    print("Iteration:", iteration)
+    iterationStartTime = datetime.datetime.now()
+
+    threadAzure = threading.Thread(target=azureBlock)
+    threadSd = threading.Thread(target=sdBlock)
+    threadAzure.start()
+    threadSd.start()
+
+    threadSd.join()
+    threadAzure.join()
+
+    print("Start Matcher", flush=True)
+    with open(path + "AzureSdMatch.py") as match:
+        exec(match.read())
+    print("End Matcher", flush=True)
 
     try:
         print("Initial review", flush=True)

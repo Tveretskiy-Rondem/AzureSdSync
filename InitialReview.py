@@ -24,18 +24,13 @@ headers = {
 # Debug:
 newWorkItemsList = []
 
-print("1")
 # Получение списка заявок SD, перешедших в статус "На рассмотрении":
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
-print("2")
 for issueId in issuesOpenToInJob:
-    print("Issue id:", issueId)
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
-    print("3")
     if workItemId != []:
-        print("4")
         # Связанная задача есть, проверка статуса в azure:
         workItemId = workItemId[0][0]
         responseWorkItem = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + str(workItemId)), headers=headers, verify=False)
@@ -49,35 +44,29 @@ for issueId in issuesOpenToInJob:
         responseWorkItemStatus = responseWorkItem["System.State"]
         responseWorkItemProject = responseWorkItem["System.AreaPath"]
         if responseWorkItemStatus == "Бэклог" and responseWorkItemProject == "Discovery":
-            print("5")
             payloadToBacklog = json.dumps({"code": "primo_rpa_backlog", "comment": "Заявка переведена в бэклог соответственно связанной задаче из azure.", "comment_public": False})
             headersToBacklog = {'Content-Type': 'application/json'}
             response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersToBacklog, data=payloadToBacklog)
     else:
         # Связанной задачи нет:
         # Получение информации из SD:
-        print("6")
         responseIssue = Functions.requestSender(service, "getItem", issueId)
         responseIssueValues = Functions.jsonValuesToList(sdJsonKeys, responseIssue, 0)
         responseStatus = Functions.jsonValuesToList([["status", "name"]], responseIssue, 0)
         # Проверка актуальности статуса:
         if responseStatus == ['На рассмотрении']:
-            print("7")
             payloadResult = []
             # Наполнение тела запроса данными:
             for i in range(len(sdJsonKeys) + 1):
-                print("8")
                 payloadTemplate["path"] = azurePaths[i]
                 # Проверка на заполнение типа и поля клиента:
                 if azurePaths[i] == "/fields/System.WorkItemType":
                     # Определение статуса work item по статусу заявки SD:
-                    print("9")
                     if responseIssueValues[i] == "Инцидент" or responseIssueValues[i] == "Ошибка" or responseIssueValues[i] == "Прочее":
                       payloadTemplate["value"] = "Bug"
                     else:
                       payloadTemplate["value"] = "User Story"
                 elif azurePaths[i] == "/fields/Custom.Client":
-                    print("10")
                     # Получение названия клиента по id:
                     sdCompanyUrlWithId = sdCompanyUrl + str(responseIssueValues[i])
                     responseSdCompany = requests.request("GET", sdCompanyUrlWithId)
@@ -87,13 +76,11 @@ for issueId in issuesOpenToInJob:
                     except KeyError:
                         payloadTemplate["value"] = "None"
                 elif azurePaths[i] == "/fields/System.Description":
-                    print("11")
                     pattern = re.compile('<.*?>')
                     responseIssueValueNoHtml = re.sub(pattern, '', responseIssueValues[i])
                     payloadTemplate["value"] = responseIssueValues[i]
                 # Неудачная попытка забрать шаги воспроизведения:
                 elif azurePaths[i] == "/fields/Microsoft.VSTS.TCM.ReproSteps":
-                    print("12")
                     for sdParameter in responseIssue["parameters"]:
                         if str(sdParameter["code"]) == "steps_to_reproduce":
 
@@ -104,14 +91,12 @@ for issueId in issuesOpenToInJob:
                                 sdParameterNoHtml = re.sub(pattern, '', "---")
                             payloadTemplate["value"] = sdParameterNoHtml
                 else:
-                    print("13")
                     payloadTemplate["value"] = responseIssueValues[i]
                 payloadResult.append(payloadTemplate.copy())
 
             # Проверка и добавление ReproSteps:
 
             # Запрос на создание work item:
-            print("14")
             payload = json.dumps(payloadResult)
             responseNewAzureWorkItem = requests.request("POST", azureUrl, headers=headers, data=payload, verify=False)
             responseNewAzureWorkItem = json.loads(responseNewAzureWorkItem.text)
@@ -121,11 +106,9 @@ for issueId in issuesOpenToInJob:
             newAzureWorkItemProject = newAzureWorkItemProject["System.AreaPath"]
 
             # Запись в таблицу соответствия
-            print("15")
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(newAzureWorkItemId) + ", " + str(issueId) + ")")
 
             # Запись о последнем действии:
-            print("16")
             Functions.dbQuerySender(dbCreds, "INSERT", ("INSERT INTO azure_work_items (id, last_action) VALUES('" + str(newAzureWorkItemId) + "', 'Initial review')"))
             Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
 
@@ -150,14 +133,12 @@ for issueId in issuesOpenToInJob:
             #     respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
 
             # Перенос комментариев:
-            print("17")
             responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
             responseSdIssueComments = json.loads(responseSdIssueComments.text)
 
             i = len(responseSdIssueComments)
             while i > 0:
             # for comment in responseSdIssueComments:
-                print("comment", i)
                 comment = responseSdIssueComments[i - 1]
                 author = comment["author"]
                 author = author["name"]
@@ -170,7 +151,6 @@ for issueId in issuesOpenToInJob:
                 respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
                 i = i - 1
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
-            print("18")
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
                 "comment": {
@@ -193,7 +173,6 @@ for issueId in issuesOpenToInJob:
             newWorkItemsList.append(newAzureWorkItemId)
 
         else:
-            print("19")
             # Статус не подтвержден:
             # ToDo: отправить оповещение?
             continue
