@@ -96,8 +96,12 @@ for issueId in issuesOpenToInJob:
                     print("12")
                     for sdParameter in responseIssue["parameters"]:
                         if str(sdParameter["code"]) == "steps_to_reproduce":
+
                             pattern = re.compile('<.*?>')
-                            sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
+                            try:
+                                sdParameterNoHtml = re.sub(pattern, '', sdParameter["value"])
+                            except:
+                                sdParameterNoHtml = re.sub(pattern, '', "---")
                             payloadTemplate["value"] = sdParameterNoHtml
                 else:
                     print("13")
