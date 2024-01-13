@@ -112,25 +112,64 @@ for issueId in issuesOpenToInJob:
             Functions.dbQuerySender(dbCreds, "INSERT", ("INSERT INTO azure_work_items (id, last_action) VALUES('" + str(newAzureWorkItemId) + "', 'Initial review')"))
             Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
 
-            # Todo сделать перенос файлов
-            # Получение и перенос в azure ссылок на вложения:
-            # responseIssue = Functions.requestSender(service, "getItem", issueId)
-            # responseAttach = responseIssue["attachments"]
-            #
-            # for attachment in responseAttach:
-            #     urlGetAttach = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/attachments/" + str(
-            #         attachment["id"]) + "?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
-            #
-            #     attachmentResponse = requests.request("GET", urlGetAttach)
-            #     attachmentResponse = json.loads(attachmentResponse.text)
-            #     attachmentUrl = attachmentResponse["attachment_url"]
-            #     # payload = json.dumps({"text": "Вложение: " + attachmentUrl})
-            #     payload = json.dumps({"text": "<a href=\"" + attachmentUrl + "\">Вложение</a>"})
-            #     headersComment = {
-            #         'Content-Type': 'application/json',
-            #         'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
-            #     }
-            #     respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+            # Перенос вложений
+            responseIssue = Functions.requestSender(service, "getItem", issueId)
+            responseAttach = responseIssue["attachments"]
+
+            for attachment in responseAttach:
+                urlGetAttach = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/attachments/" + str(
+                    attachment["id"]) + "?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e"
+
+                sdAttachmentResponse = requests.request("GET", urlGetAttach)
+                sdAttachmentResponse = json.loads(sdAttachmentResponse.text)
+                print(sdAttachmentResponse)
+
+                # Получение и сохранение прикрепленного файла
+                attachedFile = requests.request("GET", sdAttachmentResponse["attachment_url"])
+                open("/tmp/" + sdAttachmentResponse["attachment_file_name"], 'wb').write(attachedFile.content)
+                # print(attachFile.content)
+
+                # Загрузка файла на сервер Azure
+                # ToDo добавить удаление временных файлов!
+                AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + \
+                                     sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
+                payload = {}
+                files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
+                headers = {'Content-Type': 'application/octet-stream',
+                           'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
+
+                responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers,
+                                                               data=payload, files=files, verify=False)
+                azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
+                print(azureNewAttachmentJson)
+                print(azureNewAttachmentJson["url"])
+                azureNewAttachmentUrl = azureNewAttachmentJson["url"]
+                print(responseAzurePostAttachment.text)
+
+                # Сопоставление файла с work item
+                urlAttachToWI = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/workitems/" + str(
+                    newAzureWorkItemId) + "?api-version=7.0"
+
+                payload = json.dumps([
+                    {
+                        "op": "add",
+                        "path": "/relations/-",
+                        "value": {
+                            "rel": "AttachedFile",
+                            "url": azureNewAttachmentUrl,
+                            "attributes": {
+                                "comment": sdAttachmentResponse["description"]
+                            }
+                        }
+                    }
+                ])
+                headers = {
+                    'Content-Type': 'application/json-patch+json',
+                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                }
+
+                responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
+                                                      verify=False)
 
             # Перенос комментариев:
             responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
