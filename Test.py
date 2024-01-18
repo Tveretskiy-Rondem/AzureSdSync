@@ -5,8 +5,8 @@ import json
 import Functions
 
 service = "sd"
-issueId = "2701"
-newAzureWorkItemId = "9302"
+issueId = "2923"
+newAzureWorkItemId = "11360"
 # azurePostUri = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=TestFile.png"
 
 responseIssue = Functions.requestSender(service, "getItem", issueId)
