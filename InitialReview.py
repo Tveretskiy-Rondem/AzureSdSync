@@ -131,7 +131,7 @@ for issueId in issuesOpenToInJob:
                 }
                 respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
                 i = i - 1
-                
+
             # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
@@ -211,7 +211,7 @@ for issueId in issuesOpenToInJob:
                     responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
                                                           verify=False)
                 except:
-                    print("Error on attachment:", azureNewAttachmentJson)
+                    print("Error on attachment")
 
             # Debug:
             newWorkItemsList.append(newAzureWorkItemId)
