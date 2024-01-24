@@ -112,6 +112,45 @@ for issueId in issuesOpenToInJob:
             Functions.dbQuerySender(dbCreds, "INSERT", ("INSERT INTO azure_work_items (id, last_action) VALUES('" + str(newAzureWorkItemId) + "', 'Initial review')"))
             Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Initial review' WHERE id = " + str(issueId)))
 
+
+            # Перенос комментариев:
+            responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
+            responseSdIssueComments = json.loads(responseSdIssueComments.text)
+
+            i = len(responseSdIssueComments)
+            while i > 0:
+            # for comment in responseSdIssueComments:
+                comment = responseSdIssueComments[i - 1]
+                author = comment["author"]
+                author = author["name"]
+                text = comment["content"]
+                payload = json.dumps({"text": (str(text) + "   Автор в SD: " + str(author))})
+                headersComment = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                }
+                respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+                i = i - 1
+                
+            # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
+            workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
+            payloadUrlToIssueComment = json.dumps({
+                "comment": {
+                    "content": ("По этой задаче создан work item в azure: " + str(workItemUrl)),
+                    "public": False,
+                    "author_id": 22,
+                    "author_type": "employee"
+                }
+            })
+            headersUrlToIssue = {'Content-Type': 'application/json'}
+            requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssueComment, verify=False)
+            payloadUrlToIssue = json.dumps({
+                "custom_parameters": {
+                    "1111": workItemUrl
+                }
+            })
+            response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/parameters?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue)
+
             # Перенос вложений
             responseIssue = Functions.requestSender(service, "getItem", issueId)
             responseAttach = responseIssue["attachments"]
@@ -173,43 +212,6 @@ for issueId in issuesOpenToInJob:
                                                           verify=False)
                 except:
                     print("Error on attachment:", azureNewAttachmentJson)
-
-            # Перенос комментариев:
-            responseSdIssueComments = requests.request("GET", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e")
-            responseSdIssueComments = json.loads(responseSdIssueComments.text)
-
-            i = len(responseSdIssueComments)
-            while i > 0:
-            # for comment in responseSdIssueComments:
-                comment = responseSdIssueComments[i - 1]
-                author = comment["author"]
-                author = author["name"]
-                text = comment["content"]
-                payload = json.dumps({"text": (str(text) + "   Автор в SD: " + str(author))})
-                headersComment = {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
-                }
-                respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
-                i = i - 1
-            # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
-            workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
-            payloadUrlToIssueComment = json.dumps({
-                "comment": {
-                    "content": ("По этой задаче создан work item в azure: " + str(workItemUrl)),
-                    "public": False,
-                    "author_id": 22,
-                    "author_type": "employee"
-                }
-            })
-            headersUrlToIssue = {'Content-Type': 'application/json'}
-            requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssueComment, verify=False)
-            payloadUrlToIssue = json.dumps({
-                "custom_parameters": {
-                    "1111": workItemUrl
-                }
-            })
-            response = requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/parameters?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssue)
 
             # Debug:
             newWorkItemsList.append(newAzureWorkItemId)
