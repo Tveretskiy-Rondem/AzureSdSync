@@ -28,6 +28,7 @@ newWorkItemsList = []
 issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 for issueId in issuesOpenToInJob:
+    # Попытка получения связанной задачи в Azure:
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
@@ -209,8 +210,8 @@ for issueId in issuesOpenToInJob:
                     responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
                                                           verify=False)
                     print("Azure response attach to WI:", responseAttachToWI)
-                except:
-                    print("Error on attachment")
+                except Exception as exc:
+                    print("Error on attachment:", exc)
 
             # Debug:
             newWorkItemsList.append(newAzureWorkItemId)
