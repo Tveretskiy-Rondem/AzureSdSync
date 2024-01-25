@@ -171,9 +171,8 @@ for issueId in issuesOpenToInJob:
                     print("File saved locally")
 
                     # Загрузка файла на сервер Azure
-                    # ToDo починить!
-                    AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + \
-                                         sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
+                    # ToDo проверить, убрать логирование
+                    AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
                     headers = {'Content-Type': 'application/octet-stream',
