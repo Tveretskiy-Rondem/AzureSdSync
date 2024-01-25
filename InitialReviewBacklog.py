@@ -9,17 +9,25 @@ dbCreds = Vars.dbCreds
 # Todo получение из azure_statuses списка со статусом бэклог, отличным от предыдущего:
 workItemsBacklog = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_statuses WHERE status = 'Backlog' AND old_status != '' AND is_last = true")
 workItemsBacklog = Functions.responseToOneLevelArray(workItemsBacklog)
-print(workItemsBacklog)
 
 # Todo проверка на наличие связанной задачи в SD:
 workItemsSdBacklog = []
 for workItemId in workItemsBacklog:
     linkedIssueId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id = " + str(workItemId))
-    print(workItemId, linkedIssueId)
     if linkedIssueId != []:
         workItemsSdBacklog.append(workItemId)
-print(workItemsSdBacklog)
+
+# Todo TEST!!!
+workItemsSdBacklog.append(10375)
+
 # Todo проверка на запись last_action = InitialReview
+workItemsIR = []
+for workItemId in workItemsSdBacklog:
+    isInitialReview = Functions.dbQuerySender(dbCreds, "EXISTS", "SELECT EXISTS (SELECT * FROM azure_work_items WHERE id = " + str(workItemId) + " AND last_action = 'Initial review')")
+    print("SELECT EXISTS (SELECT * FROM azure_work_items WHERE id = " + str(workItemId) + " AND last_action = 'Initial review')")
+    print(workItemId, isInitialReview)
+    if isInitialReview:
+        workItemsIR.append(workItemId)
 
 # Todo проверка статуса в SD != backlog
 # Todo изменение last_action azure_work_items на InitialReviewBacklog

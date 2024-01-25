@@ -178,6 +178,8 @@ for issueId in issuesOpenToInJob:
                     headers = {'Content-Type': 'application/octet-stream',
                                'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 
+                    print(AzurePostAttachUrl)
+
                     responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers,
                                                                    data=payload, files=files, verify=False)
                     azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
