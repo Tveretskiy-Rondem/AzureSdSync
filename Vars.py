@@ -5,7 +5,7 @@ logsLevel = 2
 
 # DB:
 # dbCreds = ["postgres", "LqzzPG626!", "192.168.26.26", "5432", "primo"]
-dbCreds = ["postgres", "Qwe123!@#", "localhost", "5432", "primo"]
+dbCreds = ["postgres", "Qwe123!@#", "10.0.0.19", "5432", "primo"]
 
 # SD:
 sdService = "sd"

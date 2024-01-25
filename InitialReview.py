@@ -172,7 +172,7 @@ for issueId in issuesOpenToInJob:
 
                     # Загрузка файла на сервер Azure
                     # ToDo проверить, убрать логирование
-                    AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
+                    AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
                     headers = {'Content-Type': 'application/octet-stream',
@@ -180,8 +180,7 @@ for issueId in issuesOpenToInJob:
 
                     print(AzurePostAttachUrl)
 
-                    responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers,
-                                                                   data=payload, files=files, verify=False)
+                    responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers, data=payload, files=files, verify=False)
                     azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
                     azureNewAttachmentUrl = azureNewAttachmentJson["url"]
                     print("Azure post file response:", responseAzurePostAttachment.text)
