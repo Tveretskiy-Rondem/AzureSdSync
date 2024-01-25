@@ -162,15 +162,15 @@ for issueId in issuesOpenToInJob:
 
                     sdAttachmentResponse = requests.request("GET", urlGetAttach)
                     sdAttachmentResponse = json.loads(sdAttachmentResponse.text)
-                    print(sdAttachmentResponse)
+                    print("Response from SD after extract:", sdAttachmentResponse)
 
                     # Получение и сохранение прикрепленного файла
                     attachedFile = requests.request("GET", sdAttachmentResponse["attachment_url"])
                     open("/tmp/" + sdAttachmentResponse["attachment_file_name"], 'wb').write(attachedFile.content)
-                    # print(attachFile.content)
+                    print("File saved locally")
 
                     # Загрузка файла на сервер Azure
-                    # ToDo добавить удаление временных файлов!
+                    # ToDo починить!
                     AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + \
                                          sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
                     payload = {}
@@ -181,10 +181,8 @@ for issueId in issuesOpenToInJob:
                     responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers,
                                                                    data=payload, files=files, verify=False)
                     azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
-                    # print(azureNewAttachmentJson)
-                    # print(azureNewAttachmentJson["url"])
                     azureNewAttachmentUrl = azureNewAttachmentJson["url"]
-                    # print(responseAzurePostAttachment.text)
+                    print("Azure post file response:", responseAzurePostAttachment.text)
 
                     # Сопоставление файла с work item
                     urlAttachToWI = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/workitems/" + str(
@@ -210,6 +208,7 @@ for issueId in issuesOpenToInJob:
 
                     responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
                                                           verify=False)
+                    print("Azure response attach to WI:", responseAttachToWI)
                 except:
                     print("Error on attachment")
 
