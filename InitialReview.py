@@ -172,7 +172,7 @@ for issueId in issuesOpenToInJob:
 
                     # Загрузка файла на сервер Azure
                     # ToDo проверить, убрать логирование
-                    AzurePostAttachUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
+                    AzurePostAttachUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
                     headers = {'Content-Type': 'application/octet-stream',
@@ -223,3 +223,5 @@ for issueId in issuesOpenToInJob:
 
 # Debug:
 print("New azure work items:", newWorkItemsList)
+
+# Удалить заявку в ажур, удалить по номеру заявки из таблицы
