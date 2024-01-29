@@ -25,7 +25,7 @@ for workItemId in workItemsIR:
     linkedIssueId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id = " + str(workItemId))
     if linkedIssueId != []:
         linkedIssueId = linkedIssueId[0][0]
-        isLinkedIssueBacklog = Functions.dbQuerySender(dbCreds, "EXISTS", "SELECT EXISTS (SELECT * FROM sd_statuses WHERE id = " + str(linkedIssueId) + " AND status = 'Бэклог' AND is_last = true)")
+        isLinkedIssueBacklog = Functions.dbQuerySender(dbCreds, "EXISTS", "SELECT EXISTS (SELECT * FROM sd_statuses WHERE id = " + str(linkedIssueId) + " AND status != 'Бэклог' AND is_last = true)")
         if isLinkedIssueBacklog:
             sdIssues.append(linkedIssueId)
 
@@ -33,7 +33,9 @@ print(sdIssues)
 
 # TEST:
 for issueId in sdIssues:
-    print(Functions.dbQuerySender(dbCreds, "SELECT", "SELECT status, last_action FROM sd_issues WHERE id = " + str(issueId)))
+    lastAction = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT last_action FROM sd_issues WHERE id = " + str(issueId))
+    status = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT status FROM sd_statuses WHERE is_last = true AND id = " + str(issueId))
+    print(issueId, status, lastAction)
 
 
 # Todo изменение статуса в SD:
