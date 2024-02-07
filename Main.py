@@ -4,6 +4,7 @@ import datetime
 import threading
 
 # Todo добавить отправку сообщений о статусе.
+# Todo завести все токены в переменную (а лучше в БД).
 
 # Переключатель тест/прод:
 isTest = Vars.isTest

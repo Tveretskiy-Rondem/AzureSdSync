@@ -23,7 +23,7 @@ sdCheckUpdateJsonKeys = ["completed_at", ["type", "name"], ["priority", "name"],
 azureService = "azure"
 # azureUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/_apis/wit/workitems"
 azureUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems"
-azureHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
+azureHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='}
 # azureTableFields = ["id", "project", "type", "status", "assigned_to", "created_at", "created_by", "title", "sd_issue", "client", "url"]
 azureTableFields = ["id", "project", "type", "assigned_to", "created_at", "created_by", "title", "sd_issue", "client", "url"]
 azureJsonKeys = ["id", ["fields", "System.AreaPath"], ["fields", "System.WorkItemType"], ["fields", ["System.AssignedTo", "displayName"]], ["fields", "System.CreatedDate"], ["fields", ["System.CreatedBy", "DisplayName"]], ["fields", "System.Title"], ["fields", "Custom.ServiceDesk"], ["fields", "Custom.Client"], "url"]

@@ -13,7 +13,7 @@ checkUpdateFields = Vars.azureCheckUpdateFields
 checkUpdateJsonKeys = Vars.azureCheckUpdateJsonKeys
 wiGetHeaders = {
   'Content-Type': 'application/json-patch+json',
-  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
 }
 
 

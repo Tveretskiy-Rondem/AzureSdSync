@@ -18,7 +18,7 @@ azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Sys
 payloadTemplate = {"op": "add", "path": "", "from": None, "value": ""}
 headers = {
   'Content-Type': 'application/json-patch+json',
-  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
 }
 
 # Debug:
@@ -128,7 +128,7 @@ for issueId in issuesOpenToInJob:
                 payload = json.dumps({"text": (str(text) + "   Автор в SD: " + str(author))})
                 headersComment = {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
                 }
                 respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
                 i = i - 1
@@ -203,7 +203,7 @@ for issueId in issuesOpenToInJob:
                     ])
                     headers = {
                         'Content-Type': 'application/json-patch+json',
-                        'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='
+                        'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
                     }
 
                     responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
