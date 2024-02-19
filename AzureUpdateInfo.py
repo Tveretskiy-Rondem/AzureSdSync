@@ -90,7 +90,7 @@ for workItemId in idsList:
     # Заполнение поля "запланировано на релиз"
     workItemReleaseDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT planned_release FROM azure_work_items WHERE id = " + str(workItemId))
     if workItemApi["fields"]["System.IterationPath"] != workItemReleaseDb:
-        Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_work_items SET planned_release = " + workItemApi["fields"]["System.IterationPath"] + " WHERE id = " + str(workItemId))
+        Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_work_items SET planned_release = '" + workItemApi["fields"]["System.IterationPath"] + "' WHERE id = " + str(workItemId))
 
 # Debug:
 print("Work items deleted:", deleted)
