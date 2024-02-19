@@ -30,7 +30,7 @@ for i in range(len(checkUpdateFields)):
     if (i + 1) < len(checkUpdateFields):
         checkUpdateFieldsStr = checkUpdateFieldsStr + ", "
 
-# Получение и преобразование в одномерный массив id в таблице azure_work_items:
+# Получение и преобразование в одномерный массив id из таблицы azure_work_items:
 idsListRaw = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items ORDER BY id DESC")
 idsList = Functions.responseToOneLevelArray(idsListRaw)
 # idsList = [8605]
@@ -86,6 +86,11 @@ for workItemId in idsList:
             # Debug:
             if workItemId not in diffs:
                 diffs.append(workItemId)
+
+    # Заполнение поля "запланировано на релиз"
+    workItemReleaseDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT planned_release FROM azure_work_items WHERE id = " + str(workItemId))
+    if workItemApi["fields"]["System.IterationPath"] != workItemReleaseDb:
+        Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_work_items SET planned_release = " + workItemApi["fields"]["System.IterationPath"] + " WHERE id = " + str(workItemId))
 
 # Debug:
 print("Work items deleted:", deleted)
