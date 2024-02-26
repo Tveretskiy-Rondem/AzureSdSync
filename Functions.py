@@ -85,7 +85,6 @@ def requestSender(service, type, id):
     azureUrl = Vars.azureUrl
     azureHeaders = Vars.azureHeaders
 
-    # Todo убрана обработка исключения. Проверить!:
     if service == "sd":
         if type == "getList":
             response = requests.request("GET", (sdUrl + "/count?api_token=" + sdToken))
