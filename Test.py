@@ -56,3 +56,4 @@ while issuesListExtended != []:
     queryDelay(lastQueryTime)
     issuesListExtended = getIssuesByPage(page)
     lastQueryTime = datetime.datetime.now()
+

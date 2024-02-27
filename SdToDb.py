@@ -12,7 +12,7 @@ def queryDelay(lastQueryTime):
     if (datetime.datetime.now() - lastQueryTime).microseconds < queryDelayMs:
         time.sleep((queryDelayMs - (datetime.datetime.now() - lastQueryTime).microseconds) / 1000)
 
-def getIssuesByPage(page):
+def getIssuesByPage(page, sdToken):
     url = "https://sd.primo-rpa.ru/api/v1/issues/list?api_token=" + sdToken + "&page[size]=50&page[number]=" + str(page)
     payload = {}
     headers = {}
@@ -55,7 +55,7 @@ continueFlag = True
 
 # Первоначальный запрос:
 queryDelay(lastQueryTime)
-issuesListExtended = getIssuesByPage(page)
+issuesListExtended = getIssuesByPage(page, sdToken)
 lastQueryTime = datetime.datetime.now()
 
 # Выполнение цикла до возвращения пустого значения:
