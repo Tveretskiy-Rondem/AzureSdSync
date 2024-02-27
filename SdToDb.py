@@ -69,7 +69,7 @@ while issuesListExtended != [] and continueFlag:
     page += 1
     # Очередной запрос + функция ожидания минимального времени:
     queryDelay(lastQueryTime)
-    issuesListExtended = getIssuesByPage(page)
+    issuesListExtended = getIssuesByPage(page, sdToken)
     lastQueryTime = datetime.datetime.now()
 
 # Для каждого элемента списка проверяется условие существования в БД (для варианта без проверки последнего id),
