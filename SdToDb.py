@@ -12,6 +12,7 @@ def queryDelay(lastQueryTime):
     if (datetime.datetime.now() - lastQueryTime).microseconds < queryDelayMs:
         time.sleep((queryDelayMs - (datetime.datetime.now() - lastQueryTime).microseconds) / 1000)
 
+# Todo не работает!
 def getIssuesByPage(page, sdToken):
     url = "https://sd.primo-rpa.ru/api/v1/issues/list?api_token=" + sdToken + "&page[size]=50&page[number]=" + str(page)
     payload = {}
@@ -81,7 +82,15 @@ while issuesListExtended != [] and continueFlag:
     page += 1
     # Очередной запрос + функция ожидания минимального времени:
     queryDelay(lastQueryTime)
-    issuesListExtended = getIssuesByPage(page, sdToken)
+
+    url = "https://sd.primo-rpa.ru/api/v1/issues/list?api_token=" + sdToken + "&page[size]=50&page[number]=" + str(page)
+    payload = {}
+    headers = {}
+    issuesListExtended = requests.request("GET", url, headers=headers, data=payload)
+    issuesListExtended = issuesListExtended.text
+    issuesListExtended = json.loads(issuesListExtended)
+
+    #issuesListExtended = getIssuesByPage(page, sdToken)
     lastQueryTime = datetime.datetime.now()
 
 print(4)
