@@ -58,7 +58,15 @@ continueFlag = True
 print(2)
 # Первоначальный запрос:
 queryDelay(lastQueryTime)
-issuesListExtended = getIssuesByPage(page, sdToken)
+
+url = "https://sd.primo-rpa.ru/api/v1/issues/list?api_token=" + sdToken + "&page[size]=50&page[number]=" + str(page)
+payload = {}
+headers = {}
+issuesListExtended = requests.request("GET", url, headers=headers, data=payload)
+issuesListExtended = issuesListExtended.text
+issuesListExtended = json.loads(issuesListExtended)
+
+# issuesListExtended = getIssuesByPage(page, sdToken)
 lastQueryTime = datetime.datetime.now()
 
 print(3)
