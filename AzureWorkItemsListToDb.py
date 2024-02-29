@@ -16,7 +16,7 @@ notInDb = []
 
 # Получение последнего id в БД и изменение списка из sd или получение стартового значения:
 if fullRange:
-    lastIdInDb = [[8500]]
+    lastIdInDb = [[13900]]
 else:
     lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
 

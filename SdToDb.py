@@ -39,7 +39,6 @@ notInDb = []
 #     issuesList = Functions.requestSender(service, "getList", "")
 #     lastQueryTime = datetime.datetime.now()
 
-print(0)
 # Получение последнего id в БД:
 lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "last", "", ""))
 lastIdInDb = lastIdInDb[0][0]
