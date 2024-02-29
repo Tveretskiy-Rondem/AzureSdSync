@@ -133,7 +133,7 @@ for issueId in issuesOpenToInJob:
                 respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(newAzureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
                 i = i - 1
 
-            # ToDo Пока не разобрался с добавлением в параметр azure, запись в виде комментария:
+            # Добавление в заявку SD комментария о создании work item:
             workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(newAzureWorkItemId)
             payloadUrlToIssueComment = json.dumps({
                 "comment": {
@@ -143,6 +143,8 @@ for issueId in issuesOpenToInJob:
                     "author_type": "employee"
                 }
             })
+
+            # Добавление в заявку SD ссылки на azure дополнительным атрибутом:
             headersUrlToIssue = {'Content-Type': 'application/json'}
             requests.request("POST", "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/comments?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b", headers=headersUrlToIssue, data=payloadUrlToIssueComment, verify=False)
             payloadUrlToIssue = json.dumps({
@@ -171,18 +173,15 @@ for issueId in issuesOpenToInJob:
                     print("File saved locally")
 
                     # Загрузка файла на сервер Azure
-                    # ToDo проверить, убрать логирование
                     AzurePostAttachUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
                     headers = {'Content-Type': 'application/octet-stream', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 
-                    print(AzurePostAttachUrl)
-
                     responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers, data=payload, files=files, verify=False)
                     azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
                     azureNewAttachmentUrl = azureNewAttachmentJson["url"]
-                    print("Azure post file response:", responseAzurePostAttachment.text)
+                    # print("Azure post file response:", responseAzurePostAttachment.text)
 
                     # Сопоставление файла с work item
                     urlAttachToWI = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/" + str(

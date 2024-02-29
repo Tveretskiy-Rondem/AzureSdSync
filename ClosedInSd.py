@@ -12,6 +12,10 @@ changeStatusHeaders = {'Content-Type': 'application/json-patch+json', 'Authoriza
 postCommentHeaders = {'Content-Type': 'application/json', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
 payloadToClose = json.dumps([{"op": "add", "path": "/fields/System.State", "value": "Closed"}])
 
+# Debug:
+azureClosed = []
+azureCommented = []
+
 # Получение списка заявок SD с последним статусом "Закрыта":
 closedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'Закрыта' AND is_last = true")
 closedIssuesList = Functions.responseToOneLevelArray(closedIssuesList)
@@ -20,6 +24,7 @@ closedIssuesList = Functions.responseToOneLevelArray(closedIssuesList)
 alreadyClosedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issues WHERE last_action = 'Closed in SD'")
 alreadyClosedIssuesList = Functions.responseToOneLevelArray(alreadyClosedIssuesList)
 
+# Для каждой закрытой заявки в SD:
 for issueId in closedIssuesList:
     # Получение work item id для каждой заявки SD из списка:
     matchedWorkItems = Functions.dbQuerySender(dbCreds, "SELECT", ("SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId)))
@@ -30,29 +35,36 @@ for issueId in closedIssuesList:
         print(issueId)
 
         for workItemId in matchedWorkItems:
-            responseWorkItem = requests.request("GET", (getWorkItemUrl + str(workItemId)), headers=getWorkItemHeaders, verify=False)
-            responseWorkItem = json.loads(responseWorkItem.text)
-            responseWorkItem = responseWorkItem["value"]
-            responseWorkItem = responseWorkItem[0]
-            responseWorkItemStatus = responseWorkItem["fields"]
-            responseWorkItemStatus = responseWorkItemStatus["System.State"]
-            responseWorkItemProject = responseWorkItem["fields"]
-            responseWorkItemProject = responseWorkItemProject["System.TeamProject"]
+            # Запрос в API azure (получение проекта и статуса work item) СТАРЫЙ:
+            # responseWorkItem = requests.request("GET", (getWorkItemUrl + str(workItemId)), headers=getWorkItemHeaders, verify=False)
+            # responseWorkItem = json.loads(responseWorkItem.text)
+            # responseWorkItem = responseWorkItem["value"]
+            # responseWorkItem = responseWorkItem[0]
+            # responseWorkItemStatus = responseWorkItem["fields"]
+            # responseWorkItemStatus = responseWorkItemStatus["System.State"]
+            # responseWorkItemProject = responseWorkItem["fields"]
+            # responseWorkItemProject = responseWorkItemProject["System.TeamProject"]
+
+            # Запрос в БД (получение проекта и статуса work item):
+            workItemStatus = Functions.dbQuerySender(dbCreds, "SELECT",
+                                                             "SELECT status FROM azure_statuses WHERE is_last = true AND id = " + str(workItemId))
+            workItemStatus = workItemStatus[0][0]
+            workItemProject = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT project FROM azure_work_items WHERE id = " + str(workItemId))
+            workItemProject = workItemProject[0][0]
 
             # Проверка статуса work item в азуре:
-            if responseWorkItemStatus == "Closed":
+            if workItemStatus == "Closed":
                 # Запись о последнем действии:
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Closed in SD' WHERE id = " + str(workItemId)))
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Closed in SD' WHERE id = " + str(issueId)))
 
-            elif responseWorkItemStatus == "Design" or responseWorkItemStatus == "Backlog":
-                # Если статус в azure "Design" или "Backlog"
-                # Закрытие wi с комментарием:
-                # Закрытие:
-                responseChangeStatus = requests.request("PATCH", ("https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "?api-version=7.0-preview.3"), headers=changeStatusHeaders, data=payloadToClose, verify=False)
-                # Комментарий:
+            # Если статус в azure "Design" или "Backlog":
+            elif workItemStatus == "Design" or workItemStatus == "Backlog":
+                # Закрытие wi:
+                responseChangeStatus = requests.request("PATCH", ("https://10.0.2.14/PrimoCollection/" + workItemProject + "/_apis/wit/workItems/" + str(workItemId) + "?api-version=7.0-preview.3"), headers=changeStatusHeaders, data=payloadToClose, verify=False)
+                # Комментарий wi:
                 payloadComment = json.dumps({"text": ("Заявка в SD # " + str(issueId) + ", привязанная к этой задаче, была закрыта.")})
-                responseAddComment = requests.request("POST", ("https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3"), headers=postCommentHeaders, data=payloadComment, verify=False)
+                responseAddComment = requests.request("POST", ("https://10.0.2.14/PrimoCollection/" + workItemProject + "/_apis/wit/workItems/" + str(workItemId) + "/comments?api-version=7.0-preview.3"), headers=postCommentHeaders, data=payloadComment, verify=False)
                 # Запись о последнем действии:
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Closed in SD' WHERE id = " + str(workItemId)))
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Closed in SD' WHERE id = " + str(issueId)))
@@ -62,10 +74,10 @@ for issueId in closedIssuesList:
                 print("Response status:", responseChangeStatus)
                 print("Response comment", responseAddComment.text)
 
-            elif responseWorkItemStatus == "Test" or responseWorkItemStatus == "Review" or responseWorkItemStatus == "Ready":
+            elif workItemStatus == "Test" or workItemStatus == "Review" or workItemStatus == "Ready":
                 # Оставляем комментарий о закрытии заявки в SD:
-                payloadComment = json.dumps({"text": "Заявка в SD #" + str(issueId) + ", сопоставленная с данной таской, была закрыта. Вот."})
-                responseAddComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/" + responseWorkItemProject + "/_apis/wit/workItems/" + str(
+                payloadComment = json.dumps({"text": "Заявка в SD #" + str(issueId) + ", привязанная к этой задаче, была закрыта."})
+                responseAddComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/" + workItemProject + "/_apis/wit/workItems/" + str(
                 workItemId) + "/comments?api-version=7.0-preview.3", headers=postCommentHeaders, data=payloadComment, verify=False)
                 # Запись о последнем действии:
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE azure_work_items SET last_action = 'Closed in SD' WHERE id = " + str(workItemId)))

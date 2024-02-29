@@ -38,6 +38,7 @@ notInDb = []
 #     issuesList = Functions.requestSender(service, "getList", "")
 #     lastQueryTime = datetime.datetime.now()
 
+print(0)
 # Получение последнего id в БД:
 lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECT", "sd_issues", "last", "", ""))
 lastIdInDb = lastIdInDb[0][0]
@@ -48,16 +49,19 @@ lastIdInDb = lastIdInDb[0][0]
 #         if id < lastIdInDb + 1:
 #             issuesList.remove(id)
 
+print(1)
 # Получение списка ids из sd (запрос с пагинацией):
 issuesListExtended = ["start value"]
 page = 1
 continueFlag = True
 
+print(2)
 # Первоначальный запрос:
 queryDelay(lastQueryTime)
 issuesListExtended = getIssuesByPage(page, sdToken)
 lastQueryTime = datetime.datetime.now()
 
+print(3)
 # Выполнение цикла до возвращения пустого значения:
 while issuesListExtended != [] and continueFlag:
     # Добавление id к массиву:
@@ -72,6 +76,7 @@ while issuesListExtended != [] and continueFlag:
     issuesListExtended = getIssuesByPage(page, sdToken)
     lastQueryTime = datetime.datetime.now()
 
+print(4)
 # Для каждого элемента списка проверяется условие существования в БД (для варианта без проверки последнего id),
 # в случае отсутствия, веб-запросом получается json sd issue и помещается в БД:
 for issueId in issuesList:
