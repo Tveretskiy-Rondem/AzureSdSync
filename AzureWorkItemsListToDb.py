@@ -7,7 +7,7 @@ tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
 workItemsRange = Vars.azureWorkItemsRange
 workItemsRangeShort = []
-fullRange = False
+fullRange = True
 
 # Debug:
 notInDb = []
