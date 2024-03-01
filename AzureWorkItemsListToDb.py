@@ -34,6 +34,8 @@ if lastIdInDb > 15000:
     workItemsRangeShort.append(lastIdInDb - 100)
     workItemsRangeShort.append(lastIdInDb + 2000)
 
+print("Azure ids to DB range:", workItemsRangeShort)
+
 # Создание диапазона azure work items id для обработки (старая версия):
 # if lastIdInDb != []:
 #     workItemsRangeShort.append(lastIdInDb)
