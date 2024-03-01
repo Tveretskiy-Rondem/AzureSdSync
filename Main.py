@@ -21,21 +21,21 @@ startTime = datetime.datetime.now()
 
 def sdBlock():
     try:
-        print("Start SD to DB", flush=True)
+        print("Start SD to DB (SD - 1S)", flush=True)
         with open(path + "SdToDb.py") as sdtodb:
             exec(sdtodb.read())
-        print("End SD to DB", flush=True)
+        print("End SD to DB (SD - 1E)", flush=True)
 
-        print("Start SD status checker", flush=True)
+        print("Start SD status checker (SD - 2S)", flush=True)
         with open(path + "SdStatusChecker.py") as statuschecker:
             exec(statuschecker.read())
-        print("End SD status checker", flush=True)
+        print("End SD status checker (SD - 2E)", flush=True)
 
         if (iteration % 3) == 0:
-            print("Start SD info updater", flush=True)
+            print("Start SD info updater (SD - 3S)", flush=True)
             with open(path + "SdUpdateInfo.py") as sdupdate:
                 exec(sdupdate.read())
-            print("End SD info updater", flush=True)
+            print("End SD info updater (SD - 3E)", flush=True)
 
         print("SD block end", flush=True)
 
@@ -46,26 +46,26 @@ def sdBlock():
 
 def azureBlock():
     try:
-        print("Start Azure work items list to DB", flush=True)
+        print("Start Azure work items list to DB (AZ - 1S)", flush=True)
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
             exec(azurelistdb.read())
-        print("End Azure work items list to DB", flush=True)
+        print("End Azure work items list to DB (AZ - 1E)", flush=True)
 
-        print("Start Azure work items content to DB", flush=True)
+        print("Start Azure work items content to DB (AZ - 2S)", flush=True)
         with open(path + "AzureToDb.py") as azuretodb:
             exec(azuretodb.read())
-        print("End Azure work items content to DB", flush=True)
+        print("End Azure work items content to DB (AZ - 2E)", flush=True)
 
         if (iteration % 3) == 0:
-            print("Start Azure info updater", flush=True)
+            print("Start Azure info updater (AZ - 3S)", flush=True)
             with open(path + "AzureUpdateInfo.py") as azureupdate:
                 exec(azureupdate.read())
-            print("End Azure info updater", flush=True)
+            print("End Azure info updater (AZ - 3E)", flush=True)
 
         print("Start Azure status checker", flush=True)
-        with open(path + "AzureStatusChecker.py") as azurestatuschecker:
+        with open(path + "AzureStatusChecker.py (Logic - 1S)") as azurestatuschecker:
             exec(azurestatuschecker.read())
-        print("End Azure status checker", flush=True)
+        print("End Azure status checker (Logic - 1E)", flush=True)
 
         print("Azure block end", flush=True)
 
@@ -85,11 +85,15 @@ while True:
 
     threadSd.join()
     threadAzure.join()
-
-    print("Start Matcher", flush=True)
-    with open(path + "AzureSdMatch.py") as match:
-        exec(match.read())
-    print("End Matcher", flush=True)
+    try:
+        print("Start Matcher", flush=True)
+        with open(path + "AzureSdMatch.py") as match:
+            exec(match.read())
+        print("End Matcher", flush=True)
+    except Exception as error:
+        print("---------------", "WARNING!", end='\n')
+        print("Exception on Matcher block!")
+        print("An exception occurred:", error, flush=True)
 
     try:
         print("Initial review", flush=True)

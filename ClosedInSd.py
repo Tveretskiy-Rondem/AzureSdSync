@@ -21,7 +21,7 @@ closedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd
 closedIssuesList = Functions.responseToOneLevelArray(closedIssuesList)
 
 # Получение списка заявок SD с последней активностью "Closed in SD":
-alreadyClosedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issues WHERE last_action = 'Closed in SD'")
+alreadyClosedIssuesList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issues WHERE last_action = 'Closed in SD' OR last_action = 'Closed in azure'")
 alreadyClosedIssuesList = Functions.responseToOneLevelArray(alreadyClosedIssuesList)
 
 # Для каждой закрытой заявки в SD:
@@ -70,10 +70,8 @@ for issueId in closedIssuesList:
                 Functions.dbQuerySender(dbCreds, "UPDATE", ("UPDATE sd_issues SET last_action = 'Closed in SD' WHERE id = " + str(issueId)))
 
                 toCloseWorkItemsList.append(workItemId)
-                print("Design / Backlog", "Azure:", workItemId, "SD:", issueId)
-                print("Response status:", responseChangeStatus)
-                print("Response comment", responseAddComment.text)
 
+            # Если статус в azure "Test", "Review", "Ready":
             elif workItemStatus == "Test" or workItemStatus == "Review" or workItemStatus == "Ready":
                 # Оставляем комментарий о закрытии заявки в SD:
                 payloadComment = json.dumps({"text": "Заявка в SD #" + str(issueId) + ", привязанная к этой задаче, была закрыта."})
@@ -87,5 +85,5 @@ for issueId in closedIssuesList:
                 print("Test / Review / Ready", "Azure:", workItemId, "SD:", issueId)
                 print("Response comment", responseAddComment.text)
 
-print("Был закрыты в Azure:", toCloseWorkItemsList)
-print("Только комментарий:", onlyCommentClosedWorkItemsList)
+print("Now closed in azure:", toCloseWorkItemsList)
+print("Comment only:", onlyCommentClosedWorkItemsList)

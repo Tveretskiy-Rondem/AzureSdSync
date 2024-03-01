@@ -1,38 +1,51 @@
 import Functions
 import Vars
+import random
 
 service = "azure"
 dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
-workItemsRange = Vars.azureWorkItemsRange
 workItemsRangeShort = []
-fullRange = True
+
+# fullRange = True
+# workItemsRange = Vars.azureWorkItemsRange
 
 # Debug:
 notInDb = []
 
-# Todo: Вместо жестких рамок добавить остановку по достижении критического количества отсутствующих подряд work items.
+# Todo: Верхнюю границу вычислять исходя из последнего id в БД.
 # Todo: Добавить периодическую актуализацию всего списка.
-# Получение последнего id в БД и изменение списка из sd или получение стартового значения:
-if fullRange:
-    lastIdInDb = [[13900]]
-else:
-    lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
 
-if lastIdInDb != []:
-    workItemsRangeShort.append(lastIdInDb[0][0])
-    workItemsRangeShort.append(workItemsRange[1])
+# Выбор между полным неполным сканированием диапазона:
+if random.randint(1, 9) == 9:
+    lastIdInDb = [[1]]
 else:
-    workItemsRangeShort.append(1)
-    workItemsRangeShort.append(25000)
+    # Получение последнего id в БД:
+    lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
+    # Начальное значение = 1, если получен пустой ответ:
+    if lastIdInDb == []:
+        lastIdInDb = [[15000]]
+
+lastIdInDb = lastIdInDb[0][0]
+
+# Создание диапазона azure work items id для обработки:
+if lastIdInDb > 15000:
+    workItemsRangeShort.append(lastIdInDb - 100)
+    workItemsRangeShort.append(lastIdInDb + 2000)
+
+# Создание диапазона azure work items id для обработки (старая версия):
+# if lastIdInDb != []:
+#     workItemsRangeShort.append(lastIdInDb)
+#     workItemsRangeShort.append(workItemsRange[1])
+# else:
+#     workItemsRangeShort.append(1)
+#     workItemsRangeShort.append(25000)
 
 for workItemId in range(workItemsRangeShort[0], workItemsRangeShort[1]):
     response = Functions.requestSender(service, "exists", workItemId)
-    # print("Processing work item #", id)
     if "value" in response:
         if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_work_items", workItemId, "", "")):
-            # print("Already in DB")
             pass
         else:
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "azure_work_items", workItemId, [workItemId], ["id"]))
