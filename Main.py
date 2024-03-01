@@ -62,8 +62,8 @@ def azureBlock():
                 exec(azureupdate.read())
             print("End Azure info updater (AZ - 3E)", flush=True)
 
-        print("Start Azure status checker", flush=True)
-        with open(path + "AzureStatusChecker.py (Logic - 1S)") as azurestatuschecker:
+        print("Start Azure status checker (Logic - 1S)", flush=True)
+        with open(path + "AzureStatusChecker.py") as azurestatuschecker:
             exec(azurestatuschecker.read())
         print("End Azure status checker (Logic - 1E)", flush=True)
 
