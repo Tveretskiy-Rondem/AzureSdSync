@@ -38,7 +38,7 @@ for workItemId in workItemsIR:
         if isLinkedIssueBacklog:
             sdIssues.append(linkedIssueId)
 
-print(sdIssues)
+# print(sdIssues)
 # exit()
 
 for issueId in sdIssues:
@@ -72,8 +72,10 @@ for issueId in sdIssues:
     })
     headers = {'Content-Type': 'application/json'}
     response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
-    print(response)
-    print(response.text)
+
+    
+    # print(response)
+    # print(response.text)
 
     # Проверка на статус заявки отключена, так как статус учитывается в выборке id:
     # if issueStatus == "Закрыта":
