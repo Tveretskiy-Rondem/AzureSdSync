@@ -99,6 +99,9 @@ while True:
         print("Initial review", flush=True)
         with open(path + "InitialReview.py") as initial:
             exec(initial.read())
+        print("Initial review backlog", flush=True)
+        with open(path + "InitialReviewBacklog.py") as initialBacklog:
+            exec(initialBacklog.read())
         # print("Closed in SD")
         # with open(path + "ClosedInSd.py") as closedsd:
         #     exec(closedsd.read())
@@ -117,3 +120,4 @@ while True:
 
     print("Iteration time:", iterationTime)
     print("Time from start:", wholeTime, flush=True)
+    print("------------------------------------------------------")

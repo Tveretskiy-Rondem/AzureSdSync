@@ -39,46 +39,70 @@ for workItemId in workItemsIR:
             sdIssues.append(linkedIssueId)
 
 print(sdIssues)
-
-# Todo убрать после проверки:
-# TEST:
-for issueId in sdIssues:
-    lastAction = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT last_action FROM sd_issues WHERE id = " + str(issueId))
-    status = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT status FROM sd_statuses WHERE is_last = true AND id = " + str(issueId))
-    status = status[0][0]
-    print(issueId, status, lastAction)
+# exit()
 
 for issueId in sdIssues:
     # Получение статуса заявки в SD:
-    status = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT status FROM sd_statuses WHERE is_last = true AND id = " + str(issueId))
-    status = status[0][0]
+    issueStatus = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT status FROM sd_statuses WHERE is_last = true AND id = " + str(issueId))
+    issueStatus = issueStatus[0][0]
     # Получение id azure work item для каждой заявки SD:
     azureWorkItemId = Functions.dbQuerySender(dbCreds, "SELECT",
                                               "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
     azureWorkItemId = azureWorkItemId[0][0]
-    if status == "Закрыта":
-        # Комментарий в azure:
-        payload = json.dumps({"text": "Связанная задача в SD " + str(issueId) + " находится в статусе 'Закрыта'"})
-        respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(
-            azureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
-    else:
-        # Изменение статуса в SD:
-        urlChangeSdStatus = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=" + sdToken
-        payloadChangeSdStatus = json.dumps({
-            "code": "primo_rpa_backlog",
-            "name": "Бэклог",
-            "comment": "Соответствующая задача в azure была переведена в бэклог.",
-            "custom_parameters": {
-                "planned_release": "Номер релиза будет определен позже"
-            },
-            "skip_options": [
-                "skip_triggers",
-                "skip_notifications",
-                "skip_webhooks"
-            ]
-        })
-        headers = {'Content-Type': 'application/json'}
-        response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
+
+    # Получение значения "запланировано на релиз" из azure:
+    plannedRelease = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT planned_release FROM azure_work_items WHERE id = " + str(azureWorkItemId))
+    plannedRelease = plannedRelease[0][0]
+
+    # Изменение статуса в SD:
+    urlChangeSdStatus = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=" + sdToken
+    payloadChangeSdStatus = json.dumps({
+        "code": "primo_rpa_backlog",
+        "name": "Бэклог",
+        "comment": "Привязанная задача в azure была переведена в бэклог.",
+        "custom_parameters": {
+            "release_azure": plannedRelease,
+            "planned_release": "Номер релиза будет определен позже"
+        },
+        "skip_options": [
+            "skip_triggers",
+            "skip_notifications",
+            "skip_webhooks"
+        ]
+    })
+    headers = {'Content-Type': 'application/json'}
+    response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
+    print(response)
+    print(response.text)
+
+    # Проверка на статус заявки отключена, так как статус учитывается в выборке id:
+    # if issueStatus == "Закрыта":
+    #     # Комментарий в azure:
+    #     payload = json.dumps({"text": "Связанная задача в SD " + str(issueId) + " находится в статусе 'Закрыта'"})
+    #     respComment = requests.request("POST", "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workItems/" + str(
+    #         azureWorkItemId) + "/comments?api-version=7.0-preview.3", headers=headersComment, data=payload, verify=False)
+    # elif issueStatus == 'На рассмотрении':
+    #     # Получение значения "запланировано на релиз" из azure:
+    #     plannedRelease = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT planned_release FROM azure_work_items WHERE id = " + str(azureWorkItemId))
+    #     plannedRelease = plannedRelease[0][0]
+    #     # Изменение статуса в SD:
+    #     urlChangeSdStatus = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/statuses?api_token=" + sdToken
+    #     payloadChangeSdStatus = json.dumps({
+    #         "code": "primo_rpa_backlog",
+    #         "name": "Бэклог",
+    #         "comment": "Привязанная задача в azure была переведена в бэклог.",
+    #         "custom_parameters": {
+    #             "release_azure": plannedRelease
+    #         },
+    #         "skip_options": [
+    #             "skip_triggers",
+    #             "skip_notifications",
+    #             "skip_webhooks"
+    #         ]
+    #     })
+    #     headers = {'Content-Type': 'application/json'}
+    #     response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
+    # Todo: добавить обработку других статусов:
 
     # Изменение last_action в azure_work_items и в sd_issues на Initial review backlog:
     Functions.dbQuerySender(dbCreds, "UPDATE",

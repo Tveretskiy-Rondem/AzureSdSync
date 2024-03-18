@@ -90,13 +90,13 @@ for workItemId in idsList:
     # Заполнение поля "запланировано на релиз"
     workItemReleaseDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT planned_release FROM azure_work_items WHERE id = " + str(workItemId))
     plannedReleaseApi = workItemApi["fields"]["System.IterationPath"]
-    substringsToDelete = ["Studio", "Orchestrator", "Discovery", "Linux", "Studio Linux", "AutoDoc", " ", "\\"]
+    substringsToDelete = ["Studio", "Orchestrator", "Discovery", "Linux", "Studio Linux", "AutoDoc", "Primo(Archive)", " ", "\\"]
     for substring in substringsToDelete:
         plannedReleaseApi = plannedReleaseApi.replace(substring, "")
     if plannedReleaseApi != workItemReleaseDb:
         Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE azure_work_items SET planned_release = '" + plannedReleaseApi + "' WHERE id = " + str(workItemId))
 
 # Debug:
-print("Work items deleted:", deleted)
-print("Work items UNDELETED:", undeleted)
+# print("Work items deleted:", deleted)
+# print("Work items UNDELETED:", undeleted)
 print("Work items updated:", diffs)

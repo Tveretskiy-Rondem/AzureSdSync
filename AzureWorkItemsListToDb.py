@@ -14,9 +14,6 @@ workItemsRangeShort = []
 # Debug:
 notInDb = []
 
-# Todo: Верхнюю границу вычислять исходя из последнего id в БД.
-# Todo: Добавить периодическую актуализацию всего списка.
-
 # Выбор между полным неполным сканированием диапазона:
 if random.randint(1, 9) == 9:
     lastIdInDb = [[1]]
@@ -32,7 +29,10 @@ lastIdInDb = lastIdInDb[0][0]
 # Создание диапазона azure work items id для обработки:
 if lastIdInDb > 15000:
     workItemsRangeShort.append(lastIdInDb - 100)
-    workItemsRangeShort.append(lastIdInDb + 2000)
+    workItemsRangeShort.append(lastIdInDb + 1000)
+else:
+    workItemsRangeShort.append(0)
+    workItemsRangeShort.append(lastIdInDb + 1000)
 
 print("Azure ids to DB range:", workItemsRangeShort)
 
