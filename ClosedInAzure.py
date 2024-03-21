@@ -89,7 +89,7 @@ for workItemId in workItemsList:
                 url = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "/parameters?api_token=" + sdToken
                 payload = json.dumps({
                     "custom_parameters": {
-                        "release_azure": "1.24.12"
+                        "release_azure": responseWorkItemIteration
                     },
                     "skip_options": [
                         "skip_triggers",
