@@ -3,7 +3,7 @@ import json
 import Vars
 import Functions
 
-# Todo: добавить индикацию
+# Todo: добавить замедление
 
 dbCreds = Vars.dbCreds
 getWorkItemUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids="
@@ -28,9 +28,9 @@ for closedWorkItem in closedWorkItemsList:
     if closedWorkItem not in alreadyClosedWorkItemsList:
         workItemsList.append(closedWorkItem)
 
-print("Closed azure: ", closedWorkItemsList)
-print("Already closed: ", alreadyClosedWorkItemsList)
-print("Final list: ", workItemsList)
+# print("Closed azure: ", closedWorkItemsList)
+# print("Already closed: ", alreadyClosedWorkItemsList)
+# print("Final list: ", workItemsList)
 #exit()
 for workItemId in workItemsList:
     # Получение заявок в SD для каждой таски:
