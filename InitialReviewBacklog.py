@@ -73,9 +73,9 @@ for issueId in sdIssues:
     headers = {'Content-Type': 'application/json'}
     response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
 
-    
-    # print(response)
-    # print(response.text)
+    # Debug:
+    print(response)
+    print(response.text)
 
     # Проверка на статус заявки отключена, так как статус учитывается в выборке id:
     # if issueStatus == "Закрыта":
@@ -104,7 +104,7 @@ for issueId in sdIssues:
     #     })
     #     headers = {'Content-Type': 'application/json'}
     #     response = requests.request("POST", urlChangeSdStatus, headers=headers, data=payloadChangeSdStatus)
-    # Todo: добавить обработку других статусов:
+    # Todo: добавить обработку других статусов ???:
 
     # Изменение last_action в azure_work_items и в sd_issues на Initial review backlog:
     Functions.dbQuerySender(dbCreds, "UPDATE",

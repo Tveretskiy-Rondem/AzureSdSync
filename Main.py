@@ -4,7 +4,7 @@ import datetime
 import threading
 
 # Todo добавить отправку сообщений о статусе.
-# Todo завести все токены в переменную (а лучше в БД).
+# Todo завести все токены в БД.
 
 # Переключатель тест/прод:
 isTest = Vars.isTest
@@ -105,9 +105,9 @@ while True:
         # print("Closed in SD")
         # with open(path + "ClosedInSd.py") as closedsd:
         #     exec(closedsd.read())
-        # print("Closed in azure")
-        # with open(path + "ClosedInAzure.py") as closedazure:
-        #     exec(closedazure.read())
+        print("Closed in azure")
+        with open(path + "ClosedInAzure.py") as closedazure:
+            exec(closedazure.read())
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on Main logic block!")
