@@ -6,7 +6,8 @@ service = "azure"
 dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
 jsonKeys = Vars.azureJsonKeys
-workItemsRangeShort = []
+workItemsRange = []
+lastIdInDb = []
 
 # fullRange = True
 # workItemsRange = Vars.azureWorkItemsRange
@@ -14,27 +15,24 @@ workItemsRangeShort = []
 # Debug:
 notInDb = []
 
-# Выбор между полным неполным сканированием диапазона:
-if random.randint(1, 9) == 9:
-    lastIdInDb = [[1]]
-else:
+while lastIdInDb == []:
     # Получение последнего id в БД:
-    lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
-    # Начальное значение = 1, если получен пустой ответ:
-    if lastIdInDb == []:
-        lastIdInDb = [[15000]]
+    lastIdInDb = Functions.dbQuerySender(dbCreds, "SELECT",
+                                         "SELECT id FROM azure_work_items WHERE url IS NOT NULL ORDER BY id DESC LIMIT 1")
 
 lastIdInDb = lastIdInDb[0][0]
 
-# Создание диапазона azure work items id для обработки:
-if lastIdInDb > 15000:
-    workItemsRangeShort.append(lastIdInDb - 300)
-    workItemsRangeShort.append(lastIdInDb + 300)
+# Выбор между обычным и расширенным сканированием диапазона:
+if random.randint(1, 26) == 9:
+    # Расширенный диапазон:
+    workItemsRange.append(lastIdInDb - 10000)
+    workItemsRange.append(lastIdInDb + 300)
 else:
-    workItemsRangeShort.append(0)
-    workItemsRangeShort.append(lastIdInDb + 20000)
+    # Обычный диапазон:
+    workItemsRange.append(lastIdInDb - 300)
+    workItemsRange.append(lastIdInDb + 300)
 
-print("Azure ids to DB range:", workItemsRangeShort)
+print("Azure ids to DB range:", workItemsRange)
 
 # Создание диапазона azure work items id для обработки (старая версия):
 # if lastIdInDb != []:
@@ -44,7 +42,7 @@ print("Azure ids to DB range:", workItemsRangeShort)
 #     workItemsRangeShort.append(1)
 #     workItemsRangeShort.append(25000)
 
-for workItemId in range(workItemsRangeShort[0], workItemsRangeShort[1]):
+for workItemId in range(workItemsRange[0], workItemsRange[1]):
     response = Functions.requestSender(service, "exists", workItemId)
     if "value" in response:
         if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "azure_work_items", workItemId, "", "")):
