@@ -60,6 +60,7 @@ for issueId in sdIssues:
         "code": "primo_rpa_backlog",
         "name": "Бэклог",
         "comment": "Привязанная задача в azure была переведена в бэклог.",
+        "comment_public": False,
         "custom_parameters": {
             "release_azure": plannedRelease,
             "planned_release": "Номер релиза будет определен позже"
