@@ -3,7 +3,8 @@ import json
 import Functions
 import Vars
 
-# Todo исключить Archive
+# Todo: исключить Archive
+# Todo: обновление связи с sd
 
 service = "azure"
 dbCreds = Vars.dbCreds

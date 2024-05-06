@@ -60,7 +60,7 @@ for issueId in closedIssuesList:
 
             # Если статус в azure "Design" или "Backlog":
             elif workItemStatus == "Design" or workItemStatus == "Backlog":
-                # Todo Закрытие wi :
+                # Закрытие wi:
                 responseChangeStatus = requests.request("PATCH", ("https://10.0.2.14/PrimoCollection/" + workItemProject + "/_apis/wit/workItems/" + str(workItemId) + "?api-version=7.0-preview.3"), headers=changeStatusHeaders, data=payloadToClose, verify=False)
                 # Комментарий wi:
                 payloadComment = json.dumps({"text": ("Заявка в SD # " + str(issueId) + ", привязанная к этой задаче, была закрыта.")})

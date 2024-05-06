@@ -22,6 +22,7 @@ for issuesByWorkItem in azureWorkItemsList:
     issuesByWorkItemPrepared = issuesByWorkItem[1].strip()
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(", ", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace("https://sd.primo-rpa.ru/issues/", "")
+    # issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace("ГазпромИнформ", "")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace("#!", "")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace("/", "")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(" ", "---")
@@ -29,6 +30,11 @@ for issuesByWorkItem in azureWorkItemsList:
 
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
+        if not str(issueByWorkItem).isdigit():
+            print("Incorrect value!")
+            print("Azure work item:", workItemId)
+            print("Value:", issueByWorkItem)
+            continue
         issuesByWorkItemFromTable = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id =" + str(workItemId))
         issuesByWorkItemFromTable = Functions.responseToOneLevelArray(issuesByWorkItemFromTable)
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
@@ -37,7 +43,7 @@ for issuesByWorkItem in azureWorkItemsList:
             pass
         else:
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(workItemId) + ", " + str(issueByWorkItem) + ")")
-
+            # pass
             # Debug:
             newMatches.append("Azure: " + str(workItemId) + "; SD: " + str(issueByWorkItem))
 
