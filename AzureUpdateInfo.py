@@ -5,7 +5,9 @@ import Vars
 
 # Todo: исключить Archive
 # Todo: обновление связи с sd
+# Todo: комментарии и вложения
 
+azureAuth = Vars.azureAuth
 service = "azure"
 dbCreds = Vars.dbCreds
 tableFields = Vars.azureTableFields
@@ -14,7 +16,7 @@ checkUpdateFields = Vars.azureCheckUpdateFields
 checkUpdateJsonKeys = Vars.azureCheckUpdateJsonKeys
 wiGetHeaders = {
   'Content-Type': 'application/json-patch+json',
-  'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
+  'Authorization': azureAuth
 }
 
 
