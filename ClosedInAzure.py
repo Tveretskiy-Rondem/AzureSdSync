@@ -6,8 +6,9 @@ import Functions
 # Todo: добавить замедление
 
 dbCreds = Vars.dbCreds
+azureAuth = Vars.azureAuth
 getWorkItemUrl = "https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids="
-getWorkItemHeaders = {'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='}
+getWorkItemHeaders = {'Authorization': azureAuth}
 workItemsList = []
 sdToken = Vars.sdToken
 

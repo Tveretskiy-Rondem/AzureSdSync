@@ -6,15 +6,16 @@ import Vars
 
 # Todo выборки списками - словари?
 
+azureAuth = Vars.azureAuth
 dbCreds = Vars.dbCreds
 sdToken = Vars.sdToken
 headersComment = {
     'Content-Type': 'application/json',
-    'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
+    'Authorization': azureAuth
 }
 
 # Получение из azure_statuses списка со статусом бэклог, отличным от предыдущего:
-workItemsBacklog = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_statuses WHERE status = 'Backlog' AND old_status != '' AND is_last = true")
+workItemsBacklog = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM azure_statuses WHERE status = 'Backlog' AND is_last = true")
 workItemsBacklog = Functions.responseToOneLevelArray(workItemsBacklog)
 
 # Проверка на запись last_action = InitialReview
