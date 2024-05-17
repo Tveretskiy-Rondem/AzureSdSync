@@ -177,7 +177,7 @@ for issueId in issuesOpenToInJob:
                     AzurePostAttachUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
-                    headers = {'Content-Type': 'application/octet-stream', 'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOnV0bXRtbzQybjdjbHJlNGlwcTRmZ29rcHhiM3lieWV1ejV2d2RydXp2bHZtb3ZueGxtbXE='}
+                    headers = {'Content-Type': 'application/octet-stream', 'Authorization': azureAuth}
 
                     responseAzurePostAttachment = requests.request("POST", AzurePostAttachUrl, headers=headers, data=payload, files=files, verify=False)
                     azureNewAttachmentJson = json.loads(responseAzurePostAttachment.text)
