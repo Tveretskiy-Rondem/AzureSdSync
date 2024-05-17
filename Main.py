@@ -20,24 +20,32 @@ else:
 startTime = datetime.datetime.now()
 
 def sdBlock():
+    timer_sd_block = datetime.datetime.now()
     try:
         print("Start SD to DB (SD - 1S)", flush=True)
+        timer_sd = datetime.datetime.now()
         with open(path + "SdToDb.py") as sdtodb:
             exec(sdtodb.read())
-        print("End SD to DB (SD - 1E)", flush=True)
+        delta_time_sd = datetime.datetime.now() - timer_sd
+        print("End SD to DB (SD - 1E)", delta_time_sd, flush=True)
 
         print("Start SD status checker (SD - 2S)", flush=True)
+        timer_sd = datetime.datetime.now()
         with open(path + "SdStatusChecker.py") as statuschecker:
             exec(statuschecker.read())
-        print("End SD status checker (SD - 2E)", flush=True)
+        delta_time_sd = datetime.datetime.now() - timer_sd
+        print("End SD status checker (SD - 2E)", delta_time_sd, flush=True)
 
         if (iteration % 3) == 0:
             print("Start SD info updater (SD - 3S)", flush=True)
+            timer_sd = datetime.datetime.now()
             with open(path + "SdUpdateInfo.py") as sdupdate:
                 exec(sdupdate.read())
-            print("End SD info updater (SD - 3E)", flush=True)
+            delta_time_sd = datetime.datetime.now() - timer_sd
+            print("End SD info updater (SD - 3E)", delta_time_sd, flush=True)
 
-        print("SD block end", flush=True)
+        delta_time_sd_block = datetime.datetime.now() - timer_sd_block
+        print("SD block end", delta_time_sd_block, flush=True)
 
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
@@ -45,29 +53,37 @@ def sdBlock():
         print("An exception occurred:", error, flush=True)
 
 def azureBlock():
+    timer_azure_block = datetime.datetime.now()
     try:
         print("Start Azure work items list to DB (AZ - 1S)", flush=True)
+        timer_azure = datetime.datetime.now()
         with open(path + "AzureWorkItemsListToDb.py") as azurelistdb:
             exec(azurelistdb.read())
-        print("End Azure work items list to DB (AZ - 1E)", flush=True)
+        delta_time_azure = datetime.datetime.now() - timer_azure
+        print("End Azure work items list to DB (AZ - 1E)", delta_time_azure, flush=True)
 
         print("Start Azure work items content to DB (AZ - 2S)", flush=True)
         with open(path + "AzureToDb.py") as azuretodb:
             exec(azuretodb.read())
-        print("End Azure work items content to DB (AZ - 2E)", flush=True)
+        print("End Azure work items content to DB (AZ - 2E)", delta_time_azure, flush=True)
 
         if (iteration % 3) == 0:
             print("Start Azure info updater (AZ - 3S)", flush=True)
+            timer_azure = datetime.datetime.now()
             with open(path + "AzureUpdateInfo.py") as azureupdate:
                 exec(azureupdate.read())
-            print("End Azure info updater (AZ - 3E)", flush=True)
+            delta_time_azure = datetime.datetime.now() - timer_azure
+            print("End Azure info updater (AZ - 3E)", delta_time_azure, flush=True)
 
         print("Start Azure status checker (Logic - 1S)", flush=True)
+        timer_azure = datetime.datetime.now()
         with open(path + "AzureStatusChecker.py") as azurestatuschecker:
             exec(azurestatuschecker.read())
-        print("End Azure status checker (Logic - 1E)", flush=True)
+        delta_time_azure = datetime.datetime.now() - timer_azure
+        print("End Azure status checker (Logic - 1E)", delta_time_azure, flush=True)
 
-        print("Azure block end", flush=True)
+        delta_time_azure_block = datetime.datetime.now() - timer_azure_block
+        print("Azure block end", delta_time_azure_block, flush=True)
 
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
@@ -87,9 +103,11 @@ while True:
     threadAzure.join()
     try:
         print("Start Matcher", flush=True)
+        timer_logic = datetime.datetime.now()
         with open(path + "AzureSdMatch.py") as match:
             exec(match.read())
-        print("End Matcher", flush=True)
+        delta_time_logic = datetime.datetime.now() - timer_logic
+        print("End Matcher", delta_time_logic, flush=True)
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on Matcher block!")
@@ -97,17 +115,27 @@ while True:
 
     try:
         print("Initial review", flush=True)
+        timer_logic = datetime.datetime.now()
         with open(path + "InitialReview.py") as initial:
             exec(initial.read())
+        delta_time_logic = datetime.datetime.now() - timer_logic
+        print("End Initial review", delta_time_logic, flush=True)
+
         print("Initial review backlog", flush=True)
+        timer_logic = datetime.datetime.now()
         with open(path + "InitialReviewBacklog.py") as initialBacklog:
             exec(initialBacklog.read())
+        delta_time_logic = datetime.datetime.now() - timer_logic
+        print("End Initial review backlog", delta_time_logic, flush=True)
         # print("Closed in SD")
         # with open(path + "ClosedInSd.py") as closedsd:
         #     exec(closedsd.read())
         print("Closed in azure")
+        timer_logic = datetime.datetime.now()
         with open(path + "ClosedInAzure.py") as closedazure:
             exec(closedazure.read())
+        delta_time_logic = datetime.datetime.now() - timer_logic
+        print("End Closed in azure", delta_time_logic, flush=True)
     except Exception as error:
         print("---------------", "WARNING!", end='\n')
         print("Exception on Main logic block!")
