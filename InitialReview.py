@@ -39,7 +39,7 @@ for issueId in issuesOpenToInJob:
         payload = {}
         headers = {}
         responseSdAzureLink = requests.request("GET", url, headers=headers, data=payload)
-        responseSdAzureLink = json.loads(response.text)
+        responseSdAzureLink = json.loads(responseSdAzureLink.text)
         for parameter in responseSdAzureLink["parameters"]:
             if parameter["code"] == "1111" != None:
                 pattern = r"/(?<=\/)\d+"
