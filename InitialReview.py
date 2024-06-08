@@ -36,9 +36,9 @@ for issueId in issuesOpenToInJob:
     if workItemId == []:
         # Если связанная задача не найдена в БД, производится запрос в SD:
         url = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
-        payload = {}
-        headers = {}
-        responseSdAzureLink = requests.request("GET", url, headers=headers, data=payload)
+        payloadLink = {}
+        headersLink = {}
+        responseSdAzureLink = requests.request("GET", url, headers=headersLink, data=payloadLink)
         responseSdAzureLink = json.loads(responseSdAzureLink.text)
         for parameter in responseSdAzureLink["parameters"]:
             if parameter["code"] == "1111" and parameter["value"] != "":
@@ -116,7 +116,12 @@ for issueId in issuesOpenToInJob:
 
             # Запрос на создание work item:
             payload = json.dumps(payloadResult)
+            headers = {
+                'Content-Type': 'application/json-patch+json',
+                'Authorization': azureAuth
+            }
             responseNewAzureWorkItem = requests.request("POST", azureUrl, headers=headers, data=payload, verify=False)
+            print(responseNewAzureWorkItem)
             responseNewAzureWorkItem = json.loads(responseNewAzureWorkItem.text)
             newAzureWorkItemId = responseNewAzureWorkItem["id"]
             newAzureWorkItemUrl = responseNewAzureWorkItem["url"]
@@ -190,7 +195,7 @@ for issueId in issuesOpenToInJob:
                     print("File saved locally")
 
                     # Загрузка файла на сервер Azure
-                    AzurePostAttachUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=7.0-preview.3"
+                    AzurePostAttachUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/attachments?fileName=" + sdAttachmentResponse["attachment_file_name"] + "&api-version=5.1"
                     payload = {}
                     files = [('', ('attach', open(('/tmp/' + sdAttachmentResponse["attachment_file_name"]), 'rb')))]
                     headers = {'Content-Type': 'application/octet-stream', 'Authorization': azureAuth}
@@ -202,7 +207,7 @@ for issueId in issuesOpenToInJob:
 
                     # Сопоставление файла с work item
                     urlAttachToWI = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/" + str(
-                        newAzureWorkItemId) + "?api-version=7.0-preview.3"
+                        newAzureWorkItemId) + "?api-version=5.1"
 
                     payload = json.dumps([
                         {
@@ -219,7 +224,7 @@ for issueId in issuesOpenToInJob:
                     ])
                     headers = {
                         'Content-Type': 'application/json-patch+json',
-                        'Authorization': 'Basic czFcZGV2LWF6dXJlLXNkOmNqcmQ2bjV5YWttY3BmbGt3Y3ljamVrc2hjY2tzeXY1ejZrbmttbG8zMjZqc3JrZnEyb3E='
+                        'Authorization': azureAuth
                     }
 
                     responseAttachToWI = requests.request("PATCH", urlAttachToWI, headers=headers, data=payload,
