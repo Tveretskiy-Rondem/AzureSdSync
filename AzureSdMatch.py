@@ -31,10 +31,13 @@ for issuesByWorkItem in azureWorkItemsList:
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
         if not str(issueByWorkItem).isdigit():
-            print("Incorrect value!")
-            print("Azure work item:", workItemId)
-            print("Value:", issueByWorkItem)
-            continue
+            if issueByWorkItem == None:
+                continue
+            else:
+                print("Incorrect value!")
+                print("Azure work item:", workItemId)
+                print("Value:", issueByWorkItem)
+                continue
         issuesByWorkItemFromTable = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id =" + str(workItemId))
         issuesByWorkItemFromTable = Functions.responseToOneLevelArray(issuesByWorkItemFromTable)
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
