@@ -9,8 +9,8 @@ dbCreds = Vars.dbCreds
 service = "sd"
 
 azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Bug?api-version=7.0"
-# azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 sdCompanyUrl = "https://sd.primo-rpa.ru/api/v1/companies/?api_token=ae095dff50035a3dd6fd64405de7bf57c1d08e6e&id="
+# azureUrl = "https://10.0.2.14/PrimoCollection/Discovery/_apis/wit/workitems/$Task?api-version=7.0"
 # With Repro steps
 # sdJsonKeys = ["title", "description", "description", ["type", "name"], "id", "company_id"]
 # azurePaths = ["/fields/System.Title", "/fields/System.Description", "/fields/Microsoft.VSTS.TCM.ReproSteps", "/fields/System.WorkItemType", "/fields/Custom.ServiceDesk", "/fields/Custom.Client"]
@@ -31,6 +31,21 @@ issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 for issueId in issuesOpenToInJob:
     # Попытка получения связанной задачи в Azure:
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
+
+    # Если связанная задача не найдена в БД, производится запрос в SD:
+    if workItemId == []:
+        url = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
+        payload = {}
+        headers = {}
+        responseSdAzureLink = requests.request("GET", url, headers=headers, data=payload)
+        responseSdAzureLink = json.loads(response.text)
+        for parameter in responseSdAzureLink["parameters"]:
+            if parameter["code"] == "1111" != None:
+                pattern = r"/(?<=\/)\d+"
+                azureWorkItemId = re.search(pattern, parameter["value"]).group()
+                azureWorkItemId = azureWorkItemId.replace('/', '')
+                workItemId.append(azureWorkItemId)
+
     # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
         # Связанная задача есть, проверка статуса в azure:
@@ -210,6 +225,17 @@ for issueId in issuesOpenToInJob:
                                                           verify=False)
                     print("Azure response attach to WI:", responseAttachToWI)
                 except Exception as exc:
+                    # Добавление в заявку SD комментария о проблемах с переносом вложений:
+                    workItemUrl = "https://azure-dos.s1.primo1.orch/PrimoCollection/" + newAzureWorkItemProject + "/_workitems/edit/" + str(
+                        newAzureWorkItemId)
+                    payloadUrlToIssueComment = json.dumps({
+                        "comment": {
+                            "content": ("При переносе вложений в задачу azure возникли проблемы."),
+                            "public": False,
+                            "author_id": 22,
+                            "author_type": "employee"
+                        }
+                    })
                     print("Error on attachment:", exc)
 
             # Debug:
