@@ -11,6 +11,8 @@ isTest = Vars.isTest
 iteration = 0
 azureEndFlag = False
 sdEndFlag = False
+sdStatusEndFlag = False
+azureStatusEndFlag = False
 
 if isTest:
     # Test path:
@@ -24,6 +26,7 @@ startTime = datetime.datetime.now()
 def sdStatusesBlock():
     global sdEndFlag
     global azureEndFlag
+    global sdStatusEndFlag
     while not sdEndFlag and not azureEndFlag:
         try:
             print("Start SD status checker (SDST - S)", flush=True)
@@ -32,14 +35,20 @@ def sdStatusesBlock():
                 exec(statuschecker.read())
             delta_time_sdSt = datetime.datetime.now() - timer_sdSt
             print("End SD status checker (SDST - E)", delta_time_sdSt, flush=True)
+
+            sdStatusEndFlag = True
+
         except Exception as error:
             print("---------------", "WARNING!", end='\n')
             print("Exception on SD statuses block!")
             print("An exception occurred:", error, flush=True)
 
+            sdStatusEndFlag = True
+
 def azureStatusesBlock():
     global sdEndFlag
     global azureEndFlag
+    global azureStatusEndFlag
     while not sdEndFlag and not azureEndFlag:
         try:
             print("Start Azure status checker (AZST - S)", flush=True)
@@ -48,11 +57,15 @@ def azureStatusesBlock():
                 exec(azurestatuschecker.read())
             delta_time_azureSt = datetime.datetime.now() - timer_azureSt
             print("End Azure status checker (AZST - E)", delta_time_azureSt, flush=True)
+
+            azureStatusEndFlag = True
+
         except Exception as error:
             print("---------------", "WARNING!", end='\n')
             print("Exception on AZ statuses block!")
             print("An exception occurred:", error, flush=True)
 
+            azureStatusEndFlag = True
 
 def sdBlock():
     global sdEndFlag
@@ -136,9 +149,11 @@ def azureBlock():
         azureEndFlag = True
 
 def mainLogicBlock():
+    global sdStatusEndFlag
+    global azureStatusEndFlag
     global sdEndFlag
     global azureEndFlag
-    while not sdEndFlag and not azureEndFlag:
+    while not sdEndFlag and not azureEndFlag and not sdStatusEndFlag and not azureStatusEndFlag:
         time.sleep(60)
         try:
             print("Start Matcher", flush=True)
