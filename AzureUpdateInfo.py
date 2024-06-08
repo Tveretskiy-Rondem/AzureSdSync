@@ -42,7 +42,6 @@ for workItemId in idsList:
     workItemDb = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT " + checkUpdateFieldsStr + " FROM azure_work_items WHERE id = " + str(workItemId))
     try:
         workItemDbPrepared = workItemDb[0]
-        # workItemApi = Functions.requestSender(service, "getItem", workItemId)
         workItemApi = requests.request("GET", ("https://10.0.2.14/PrimoCollection/_apis/wit/workitems?ids=" + str(workItemId)), headers=wiGetHeaders, verify=False)
         workItemApi = json.loads(workItemApi.text)
         # print(workItemApi)
@@ -79,8 +78,10 @@ for workItemId in idsList:
     workItemApiPrepared = Functions.jsonValuesToList(checkUpdateJsonKeys, workItemApi, 0)
     # print(workItemDbPrepared)
     # print(workItemApiPrepared)
+
+    # Сравнение значений по каждому полю:
     for i in range(len(workItemApiPrepared)):
-        if workItemDbPrepared[i] == workItemDbPrepared[i]:
+        if workItemDbPrepared[i] == workItemApiPrepared[i]:
             pass
             # print(workItemApiPrepared[i], "=", workItemDbPrepared[i])
         else:

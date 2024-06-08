@@ -60,4 +60,3 @@ def getAzureWorkItemsByProject():
             print("Not exists in azure")
     return workItemsList
 
-print(getAzureWorkItemsByProject())

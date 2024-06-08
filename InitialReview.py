@@ -32,8 +32,9 @@ for issueId in issuesOpenToInJob:
     # Попытка получения связанной задачи в Azure:
     workItemId = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT azure_work_item_id FROM azure_sd_match WHERE sd_issue_id = " + str(issueId))
 
-    # Если связанная задача не найдена в БД, производится запрос в SD:
+    # Проверка на наличие связанной задачи в azure:
     if workItemId == []:
+        # Если связанная задача не найдена в БД, производится запрос в SD:
         url = "https://sd.primo-rpa.ru/api/v1/issues/" + str(issueId) + "?api_token=8f4c0a6edc44f6ac72a016a1182d0e03a260eb0b"
         payload = {}
         headers = {}
@@ -46,7 +47,6 @@ for issueId in issuesOpenToInJob:
                 azureWorkItemId = azureWorkItemId.replace('/', '')
                 workItemId.append(azureWorkItemId)
 
-    # Проверка на наличие связанной задачи в azure:
     if workItemId != []:
         # Связанная задача есть, проверка статуса в azure:
         workItemId = workItemId[0][0]
