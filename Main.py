@@ -21,6 +21,35 @@ else:
 
 startTime = datetime.datetime.now()
 
+def sdStatusesBlock():
+    while not sdEndFlag and not azureEndFlag:
+        try:
+            print("Start SD status checker (SDST - S)", flush=True)
+            timer_sdSt = datetime.datetime.now()
+            with open(path + "SdStatusChecker.py") as statuschecker:
+                exec(statuschecker.read())
+            delta_time_sdSt = datetime.datetime.now() - timer_sdSt
+            print("End SD status checker (SDST - E)", delta_time_sdSt, flush=True)
+        except Exception as error:
+            print("---------------", "WARNING!", end='\n')
+            print("Exception on SD statuses block!")
+            print("An exception occurred:", error, flush=True)
+
+def azureStatusesBlock():
+    while not sdEndFlag and not azureEndFlag:
+        try:
+            print("Start Azure status checker (AZST - S)", flush=True)
+            timer_azureSt = datetime.datetime.now()
+            with open(path + "AzureStatusChecker.py") as azurestatuschecker:
+                exec(azurestatuschecker.read())
+            delta_time_azureSt = datetime.datetime.now() - timer_azureSt
+            print("End Azure status checker (AZST - E)", delta_time_azureSt, flush=True)
+        except Exception as error:
+            print("---------------", "WARNING!", end='\n')
+            print("Exception on AZ statuses block!")
+            print("An exception occurred:", error, flush=True)
+
+
 def sdBlock():
     global sdEndFlag
     timer_sd_block = datetime.datetime.now()
@@ -32,12 +61,12 @@ def sdBlock():
         delta_time_sd = datetime.datetime.now() - timer_sd
         print("End SD to DB (SD - 1E)", delta_time_sd, flush=True)
 
-        print("Start SD status checker (SD - 2S)", flush=True)
-        timer_sd = datetime.datetime.now()
-        with open(path + "SdStatusChecker.py") as statuschecker:
-            exec(statuschecker.read())
-        delta_time_sd = datetime.datetime.now() - timer_sd
-        print("End SD status checker (SD - 2E)", delta_time_sd, flush=True)
+        # print("Start SD status checker (SD - 2S)", flush=True)
+        # timer_sd = datetime.datetime.now()
+        # with open(path + "SdStatusChecker.py") as statuschecker:
+        #     exec(statuschecker.read())
+        # delta_time_sd = datetime.datetime.now() - timer_sd
+        # print("End SD status checker (SD - 2E)", delta_time_sd, flush=True)
 
         if (iteration % 9) == 0 or iteration == 0:
             print("Start SD info updater (SD - 3S)", flush=True)
@@ -83,12 +112,12 @@ def azureBlock():
             delta_time_azure = datetime.datetime.now() - timer_azure
             print("End Azure info updater (AZ - 3E)", delta_time_azure, flush=True)
 
-        print("Start Azure status checker (Logic - 1S)", flush=True)
-        timer_azure = datetime.datetime.now()
-        with open(path + "AzureStatusChecker.py") as azurestatuschecker:
-            exec(azurestatuschecker.read())
-        delta_time_azure = datetime.datetime.now() - timer_azure
-        print("End Azure status checker (Logic - 1E)", delta_time_azure, flush=True)
+        # print("Start Azure status checker (Logic - 1S)", flush=True)
+        # timer_azure = datetime.datetime.now()
+        # with open(path + "AzureStatusChecker.py") as azurestatuschecker:
+        #     exec(azurestatuschecker.read())
+        # delta_time_azure = datetime.datetime.now() - timer_azure
+        # print("End Azure status checker (Logic - 1E)", delta_time_azure, flush=True)
 
         delta_time_azure_block = datetime.datetime.now() - timer_azure_block
         print("Azure block end", delta_time_azure_block, flush=True)
@@ -156,13 +185,20 @@ while True:
 
     threadAzure = threading.Thread(target=azureBlock)
     threadSd = threading.Thread(target=sdBlock)
+    threadAzureSt = threading.Thread(target=azureStatusesBlock)
+    threadSdSt = threading.Thread(target=sdStatusesBlock)
     threadLogic = threading.Thread(target=mainLogicBlock)
+
     threadAzure.start()
     threadSd.start()
+    threadAzureSt.start()
+    threadSdSt.start()
     threadLogic.start()
 
     threadSd.join()
     threadAzure.join()
+    threadSdSt.join()
+    threadAzureSt.join()
     threadLogic.join()
 
     iteration = iteration + 1
