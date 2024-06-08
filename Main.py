@@ -22,6 +22,8 @@ else:
 startTime = datetime.datetime.now()
 
 def sdStatusesBlock():
+    global sdEndFlag
+    global azureEndFlag
     while not sdEndFlag and not azureEndFlag:
         try:
             print("Start SD status checker (SDST - S)", flush=True)
@@ -36,6 +38,8 @@ def sdStatusesBlock():
             print("An exception occurred:", error, flush=True)
 
 def azureStatusesBlock():
+    global sdEndFlag
+    global azureEndFlag
     while not sdEndFlag and not azureEndFlag:
         try:
             print("Start Azure status checker (AZST - S)", flush=True)
