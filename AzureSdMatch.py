@@ -31,7 +31,7 @@ for issuesByWorkItem in azureWorkItemsList:
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
         if not str(issueByWorkItem).isdigit():
-            if str(issueByWorkItem) == "":
+            if str(issueByWorkItem) == "None":
                 continue
             else:
                 print("Incorrect value!")
