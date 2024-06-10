@@ -41,7 +41,8 @@ for issueId in issuesOpenToInJob:
         responseSdAzureLink = requests.request("GET", url, headers=headersLink, data=payloadLink)
         responseSdAzureLink = json.loads(responseSdAzureLink.text)
         for parameter in responseSdAzureLink["parameters"]:
-            if parameter["code"] == "1111" and parameter["value"] != "":
+            if parameter["code"] == "1111" and parameter["value"] != "" and str(parameter["value"]) != "None":
+                print(parameter["value"])
                 pattern = r"/(?<=\/)\d+"
                 azureWorkItemId = re.search(pattern, parameter["value"]).group()
                 azureWorkItemId = azureWorkItemId.replace('/', '')
