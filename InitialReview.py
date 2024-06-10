@@ -26,7 +26,7 @@ headers = {
 newWorkItemsList = []
 
 # Получение списка заявок SD, перешедших в статус "На рассмотрении":
-issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND old_status != '' AND is_last = true")
+issuesOpenToInJob = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_statuses WHERE status = 'На рассмотрении' AND is_last = true")
 issuesOpenToInJob = Functions.responseToOneLevelArray(issuesOpenToInJob)
 for issueId in issuesOpenToInJob:
     # Попытка получения связанной задачи в Azure:
