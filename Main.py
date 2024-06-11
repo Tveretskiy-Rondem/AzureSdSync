@@ -198,6 +198,8 @@ def mainLogicBlock():
 while True:
     azureEndFlag = False
     sdEndFlag = False
+    sdStatusEndFlag = False
+    azureStatusEndFlag = False
 
     print("Iteration:", iteration)
     iterationStartTime = datetime.datetime.now()
