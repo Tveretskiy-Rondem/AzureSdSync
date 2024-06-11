@@ -27,7 +27,7 @@ def sdStatusesBlock():
     global sdEndFlag
     global azureEndFlag
     global sdStatusEndFlag
-    while not sdEndFlag and not azureEndFlag:
+    while not sdEndFlag or not azureEndFlag:
         try:
             print("Start SD status checker (SDST - S)", flush=True)
             timer_sdSt = datetime.datetime.now()
@@ -49,7 +49,7 @@ def azureStatusesBlock():
     global sdEndFlag
     global azureEndFlag
     global azureStatusEndFlag
-    while not sdEndFlag and not azureEndFlag:
+    while not sdEndFlag or not azureEndFlag:
         try:
             print("Start Azure status checker (AZST - S)", flush=True)
             timer_azureSt = datetime.datetime.now()
@@ -153,7 +153,9 @@ def mainLogicBlock():
     global azureStatusEndFlag
     global sdEndFlag
     global azureEndFlag
-    while not sdEndFlag and not azureEndFlag and not sdStatusEndFlag and not azureStatusEndFlag:
+
+    # Выполнение цикла, пока другие операции не завершились:
+    while not sdEndFlag or not azureEndFlag or not sdStatusEndFlag or not azureStatusEndFlag:
         time.sleep(60)
         try:
             print("Start Matcher", flush=True)
