@@ -121,7 +121,7 @@ def azureBlock():
             exec(azuretodb.read())
         print("End Azure work items content to DB (AZ - 2E)", delta_time_azure, flush=True)
 
-        if (iteration % 13) == 0 or iteration == 0:
+        if iteration == 1:
             print("Start Azure info updater (AZ - 3S)", flush=True)
             timer_azure = datetime.datetime.now()
             with open(path + "AzureUpdateInfo.py") as azureupdate:
