@@ -27,6 +27,7 @@ idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issu
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
 for issueId in idsList:
+    print(issueId)
     # print("Processing issue #", id)
     # Получение sd issue запросом, преобразование в json:
     # Todo добавлен try. Проверить!:
@@ -36,6 +37,7 @@ for issueId in idsList:
         lastQueryTime = datetime.datetime.now()
         responseIssueItem = Functions.jsonValuesToList(statusJsonKeys, responseIssueItem, 0)
     except:
+        print("EXEPTION on sd query")
         continue
     # Добавление id в ключи и поля:
     responseIssueItemWithId = responseIssueItem.copy()
@@ -45,21 +47,24 @@ for issueId in idsList:
 
     # Проверка на наличие в таблице sd_statuses записи с этим id:
     if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "sd_statuses", issueId, "", "")):
+        print("Exists")
         # print("Status of issue already in DB. Compare statuses.")
         statusDbResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTlaststatus", "sd_statuses", issueId, "", ""))
         if statusDbResponse[0][0] != responseIssueItem[0]:
+            print("Not equal", statusDbResponse[0][0], responseIssueItem[0])
             # print("Detected difference. Insert new status to DB.")
             Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE sd_statuses SET is_last = false WHERE id = " + str(issueId))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "sd_statuses", issueId, responseIssueItemWithId, statusTableFieldsWithId))
             # Debug:
             diffsDetected.append(issueId)
         else:
-            # print("Diffs NOT detected.")
+            print("Equal")
             pass
     else:
         # print("Status with this id not exists in DB. Insert new status to DB.")
         Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "sd_statuses", issueId, responseIssueItemWithId, statusTableFieldsWithId))
         # Debug:
+        print("New status")
         notExistInStatuses.append(issueId)
 
 # Debug:
