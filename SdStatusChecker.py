@@ -47,7 +47,7 @@ for issueId in idsList:
     if Functions.dbQuerySender(dbCreds, "EXISTS", Functions.dbQueryGenerator("EXISTS", "sd_statuses", issueId, "", "")):
         # print("Status of issue already in DB. Compare statuses.")
         statusDbResponse = Functions.dbQuerySender(dbCreds, "SELECT", Functions.dbQueryGenerator("SELECTlaststatus", "sd_statuses", issueId, "", ""))
-        if statusDbResponse[0][0] != responseIssueItem[0] or (str(statusDbResponse[0][0]) != "" and str(responseIssueItem[0]) != ""):
+        if statusDbResponse[0][0] != responseIssueItem[0] and str(statusDbResponse[0][0]) != "None" and str(responseIssueItem[0]) != "None":
             # print("Detected difference. Insert new status to DB.")
             Functions.dbQuerySender(dbCreds, "UPDATE", "UPDATE sd_statuses SET is_last = false WHERE id = " + str(issueId))
             Functions.dbQuerySender(dbCreds, "INSERT", Functions.dbQueryGenerator("INSERT", "sd_statuses", issueId, responseIssueItemWithId, statusTableFieldsWithId))
