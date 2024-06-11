@@ -27,7 +27,6 @@ idsResponse = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id FROM sd_issu
 idsList = Functions.responseToOneLevelArray(idsResponse)
 
 for issueId in idsList:
-    print(issueId)
     # print("Processing issue #", id)
     # Получение sd issue запросом, преобразование в json:
     # Todo добавлен try. Проверить!:
