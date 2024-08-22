@@ -4,6 +4,8 @@ import re
 import Functions
 import Vars
 
+#ToDo: Добавить обработку ошибки создания wi.
+
 azureAuth = Vars.azureAuth
 dbCreds = Vars.dbCreds
 service = "sd"

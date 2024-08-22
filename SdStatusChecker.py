@@ -29,7 +29,6 @@ idsList = Functions.responseToOneLevelArray(idsResponse)
 for issueId in idsList:
     # print("Processing issue #", id)
     # Получение sd issue запросом, преобразование в json:
-    # Todo добавлен try. Проверить!:
     try:
         queryDelay(lastQueryTime)
         responseIssueItem = Functions.requestSender(service, "getItem", issueId)

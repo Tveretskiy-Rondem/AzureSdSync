@@ -5,6 +5,7 @@ import threading
 
 # Todo добавить отправку сообщений о статусе.
 # Todo завести все токены в БД.
+# Todo 
 
 # Переключатель тест/прод:
 isTest = Vars.isTest
