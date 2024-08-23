@@ -29,15 +29,11 @@ for issuesByWorkItem in azureWorkItemsList:
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(",", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.split("---")
     print(issuesByWorkItem, issuesByWorkItemPrepared)
-    if int(workItemId) == 26689:
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
         if not str(issueByWorkItem).isdigit():
-            print("Not digits")
             if str(issueByWorkItem) == "None":
-                print("Value = none")
                 continue
             else:
                 print("Incorrect value!")
@@ -51,14 +47,12 @@ for issuesByWorkItem in azureWorkItemsList:
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
             # ToDo добавить актуализацию ссылки на azure:
             # Todo Если заявка уже в списке, проверка на актуальность ссылки на azure work item:
-            print("Already")
             pass
         else:
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(workItemId) + ", " + str(issueByWorkItem) + ")")
             # pass
             # Debug:
             newMatches.append("Azure: " + str(workItemId) + "; SD: " + str(issueByWorkItem))
-            print("Add")
 
 # Debug:
 print("New matches:", newMatches)
