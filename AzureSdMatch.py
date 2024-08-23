@@ -12,8 +12,8 @@ service = "azure"
 newMatches = []
 
 # Удаление из БД связей по несуществующим work_item_id:
-Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id NOT IN (SELECT id FROM azure_work_items WHERE is_deleted = false)")
-# Получение из БД списка неудаленный work items:
+# Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id NOT IN (SELECT id FROM azure_work_items WHERE is_deleted = false)")
+# Получение из БД списка неудаленных work items:
 azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE is_deleted = false AND sd_issue IS NOT NULL")
 
 # Для каждой заявки в SD в списке work items. Преобразование в номер:
@@ -28,28 +28,37 @@ for issuesByWorkItem in azureWorkItemsList:
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(" ", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(",", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.split("---")
+    print(issuesByWorkItem, issuesByWorkItemPrepared)
+    if int(workItemId) == 26689:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
         if not str(issueByWorkItem).isdigit():
+            print("Not digits")
             if str(issueByWorkItem) == "None":
+                print("Value = none")
                 continue
             else:
                 print("Incorrect value!")
                 print("Azure work item:", workItemId)
                 print("Value:", issueByWorkItem)
                 continue
+
+        #
         issuesByWorkItemFromTable = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT sd_issue_id FROM azure_sd_match WHERE azure_work_item_id =" + str(workItemId))
         issuesByWorkItemFromTable = Functions.responseToOneLevelArray(issuesByWorkItemFromTable)
         if int(issueByWorkItem) in issuesByWorkItemFromTable:
             # ToDo добавить актуализацию ссылки на azure:
             # Todo Если заявка уже в списке, проверка на актуальность ссылки на azure work item:
+            print("Already")
             pass
         else:
             Functions.dbQuerySender(dbCreds, "INSERT", "INSERT INTO azure_sd_match (azure_work_item_id, sd_issue_id) VALUES(" + str(workItemId) + ", " + str(issueByWorkItem) + ")")
             # pass
             # Debug:
             newMatches.append("Azure: " + str(workItemId) + "; SD: " + str(issueByWorkItem))
+            print("Add")
 
 # Debug:
 print("New matches:", newMatches)
