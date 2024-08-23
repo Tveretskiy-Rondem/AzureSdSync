@@ -28,7 +28,6 @@ for issuesByWorkItem in azureWorkItemsList:
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(" ", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.replace(",", "---")
     issuesByWorkItemPrepared = issuesByWorkItemPrepared.split("---")
-    print(issuesByWorkItem, issuesByWorkItemPrepared)
 
     # Проверка на наличие заявки SD в таблице соответствия:
     for issueByWorkItem in issuesByWorkItemPrepared:
