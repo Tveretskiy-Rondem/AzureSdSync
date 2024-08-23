@@ -14,7 +14,7 @@ newMatches = []
 # Удаление из БД связей по несуществующим work_item_id:
 # Functions.dbQuerySender(dbCreds, "DELETE", "DELETE FROM azure_sd_match WHERE azure_work_item_id NOT IN (SELECT id FROM azure_work_items WHERE is_deleted = false)")
 # Получение из БД списка неудаленных work items:
-azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE is_deleted = false AND sd_issue IS NOT NULL")
+azureWorkItemsList = Functions.dbQuerySender(dbCreds, "SELECT", "SELECT id, sd_issue FROM azure_work_items WHERE sd_issue IS NOT NULL")
 
 # Для каждой заявки в SD в списке work items. Преобразование в номер:
 for issuesByWorkItem in azureWorkItemsList:
